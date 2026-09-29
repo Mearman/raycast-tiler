@@ -37,7 +37,7 @@ pnpm dev
 - `pnpm test:coverage` runs the suite with V8 coverage.
 - `pnpm lint` runs `ray lint`: manifest checks, ESLint and Prettier. Fix formatting with `pnpm exec ray lint --fix`. Run ESLint alone with `pnpm exec eslint . --max-warnings 0`.
 - `pnpm typecheck` runs `ray build` first, then `tsc --noEmit`. The build generates `raycast-env.d.ts`, which types the preferences and command arguments. Git ignores that file.
-- `pnpm mutation` runs Stryker on the pure logic modules. It uses the command runner and reads `stryker.config.ts`.
+- `pnpm mutation` runs Stryker on the pure logic modules with the Vitest runner and the TypeScript checker. It reads `stryker.config.ts`.
 
 ## Architecture
 
@@ -80,7 +80,7 @@ Raycast-bound:
 - Fullscreen windows have no position to tile from and are skipped. Resizing one would take it out of fullscreen.
 - `disabledByDefault` only applies when Raycast first installs the extension or first sees a new command. An existing install keeps the enabled state it has. Change it in Raycast Settings, Extensions, or import the extension again.
 - Raycast preferences cannot hold a button, and the API cannot enable or disable commands.
-- `@stryker-mutator/vitest-runner` crashes on start with Vitest 5, so Stryker uses the command runner and re-runs the whole suite for every mutant. Run it as `stryker run stryker.config.ts`. Without the path, Stryker ignores the file and mutates everything.
+- Stryker only loads `stryker.config.ts` when it is named: `stryker run stryker.config.ts`. Without the path, Stryker ignores the file and mutates every source file.
 - TypeScript is pinned to version 6, because `typescript-eslint` does not support version 7.
 - The global pnpm setting `ignore-scripts=true` stops the `prepare` script, so `husky` does not install its own hooks path here. The machine-wide hook dispatcher runs the scripts in `.husky/` instead. `pnpm-workspace.yaml` marks the `esbuild` build script as not allowed.
 
