@@ -1,2 +1,4 @@
 allowBuilds:
   esbuild: false
+overrides:
+  conventional-changelog-writer: ^9.2.1

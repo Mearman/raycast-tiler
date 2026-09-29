@@ -1,6 +1,7 @@
 {
   "name": "window-tiler",
   "description": "Tile windows into grid, column, row, main-stack and spiral layouts, with include and exclude lists.",
+  "version": "0.0.0-development",
   "author": "mearman",
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "categories": [
@@ -413,6 +414,12 @@
     "@eslint/js": "10.0.1",
     "@exadev/eslint-config": "2.23.0",
     "@raycast/eslint-plugin": "2.2.0",
+    "@semantic-release/changelog": "7.0.0",
+    "@semantic-release/commit-analyzer": "13.0.1",
+    "@semantic-release/git": "11.0.1",
+    "@semantic-release/github": "12.0.10",
+    "@semantic-release/npm": "13.2.0",
+    "@semantic-release/release-notes-generator": "14.1.1",
     "@stryker-mutator/api": "10.0.0",
     "@stryker-mutator/core": "10.0.0",
     "@stryker-mutator/typescript-checker": "10.0.0",
@@ -420,6 +427,7 @@
     "@types/node": "26.6.3",
     "@types/react": "19.3.0",
     "@vitest/coverage-v8": "5.0.2",
+    "conventional-changelog-conventionalcommits": "10.4.0",
     "eslint": "10.11.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-prettier": "5.5.6",
@@ -427,12 +435,18 @@
     "husky": "9.1.7",
     "lint-staged": "17.6.0",
     "prettier": "3.9.9",
+    "semantic-release": "25.0.9",
     "typescript": "6.0.3",
     "typescript-eslint": "8.71.0",
     "vitest": "5.0.2"
   },
+  "files": [
+    "assets",
+    "src"
+  ],
   "icon": "extension-icon.png",
   "license": "MIT",
+  "packageManager": "pnpm@12.6.0",
   "platforms": [
     "macOS"
   ],
@@ -561,12 +575,17 @@
       "placeholder": "200"
     }
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mearman/raycast-tiler.git"
+  },
   "scripts": {
     "build": "ray build",
     "dev": "ray develop",
     "lint": "ray lint",
     "mutation": "stryker run stryker.config.ts",
-    "prepare": "husky",
+    "prepare": "git config --get core.hooksPath > /dev/null || husky",
+    "release": "semantic-release",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "typecheck": "ray build && tsc --noEmit"
