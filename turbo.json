@@ -1,0 +1,40 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "globalDependencies": ["pnpm-lock.yaml"],
+  // Every task name is the underscore-prefixed script that holds the real command. The public script of the same name without the underscore runs turbo, so calling the public name from here would make turbo start turbo again, the recursive case Turborepo's documentation warns against.
+  "tasks": {
+    // `ray build` compiles the extension and, as a side effect, writes raycast-env.d.ts, which types the preferences and command arguments. Git ignores that file, so every task that type-checks the code depends on this one.
+    "_build": {
+      "inputs": ["package.json", "src/**", "tsconfig.json"],
+      "outputs": ["raycast-env.d.ts"]
+    },
+    "_lint": {
+      "dependsOn": ["_build"],
+      "inputs": ["$TURBO_DEFAULT$", "eslint.config.ts", "prettier.config.ts"],
+      "outputs": [".eslintcache"]
+    },
+    "_mutation": {
+      "dependsOn": ["_build"],
+      "inputs": [
+        "src/**",
+        "stryker.config.ts",
+        "vitest.config.ts",
+        "tsconfig.json"
+      ],
+      "outputs": ["reports/**"]
+    },
+    "_test": {
+      "inputs": ["$TURBO_DEFAULT$", "vitest.config.ts"],
+      "outputs": []
+    },
+    "_test:coverage": {
+      "inputs": ["$TURBO_DEFAULT$", "vitest.config.ts"],
+      "outputs": ["coverage/**"]
+    },
+    "_typecheck": {
+      "dependsOn": ["_build"],
+      "inputs": ["$TURBO_DEFAULT$", "tsconfig.json"],
+      "outputs": []
+    }
+  }
+}

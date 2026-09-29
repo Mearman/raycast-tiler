@@ -1,2 +1,2 @@
-# The same typecheck, lint and test run CI does, so a push cannot break the build.
-pnpm run typecheck && pnpm run lint && pnpm test
+# The same typecheck, lint and test run CI does, in one cached turbo run, so a push cannot break the build.
+pnpm run prepush

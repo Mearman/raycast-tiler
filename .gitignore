@@ -4,6 +4,8 @@ raycast-env.d.ts
 coverage
 reports
 .stryker-tmp
+.turbo
+.eslintcache
 !CLAUDE.md
 !AGENTS.md
 !**/CLAUDE.md

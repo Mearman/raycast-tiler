@@ -89,7 +89,7 @@ jobs:
           restore-keys: |
             stryker-incremental-
       # On main the whole run is forced, because Stryker's differ only sees mutated and test files and cannot see a change elsewhere that alters behaviour.
-      - run: pnpm mutation${{ github.ref == 'refs/heads/main' && ' --force' || '' }}
+      - run: pnpm mutation${{ github.ref == 'refs/heads/main' && ' -- --force' || '' }}
       - name: Save Stryker incremental result cache
         if: always()
         uses: actions/cache/save@v6
