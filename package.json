@@ -613,7 +613,7 @@
       "description": "Each window finishes moving and resizing before the next starts, in layout order, instead of all windows moving together. The whole transition then takes as long as all windows added up.",
       "type": "checkbox",
       "required": false,
-      "default": false
+      "default": true
     }
   ],
   "repository": {
