@@ -57,14 +57,12 @@ async function tileWindows(
   const {
     layout: preferredLayout,
     gap: rawGap,
-    stackOffset: rawStackOffset,
     moveDuration: rawMoveDuration,
     resizeDuration: rawResizeDuration,
   } = getPreferenceValues<Preferences>();
   const layout = layoutOverride ?? preferredLayout;
   if (!isLayoutId(layout)) throw new Error(`Unknown layout "${layout}"`);
   const gap = parseNonNegative("Gap", rawGap);
-  const stackOffset = parseNonNegative("Stack offset", rawStackOffset);
   const durations = {
     moveMs: parseNonNegative("Move duration", rawMoveDuration),
     resizeMs: parseNonNegative("Resize duration", rawResizeDuration),
@@ -98,9 +96,7 @@ async function tileWindows(
       width: desktop.size.width,
       height: desktop.size.height,
     };
-    const rects = layoutWindows(layout, windows.length, area, gap, {
-      stackOffset,
-    });
+    const rects = layoutWindows(layout, windows.length, area, gap);
     const bySlot = assignToNearestSlots(windows, centreOf, rects);
     return bySlot.map((window, index) => {
       const rect = rects[index];

@@ -1,8 +1,8 @@
 import { rows } from "./rows";
-import type { AreaLayout, Rect } from "./types";
+import type { Layout, Rect } from "./types";
 
 /** The first window fills the left half; the rest stack in equal rows on the right half. A lone window fills the area. */
-export const mainStack: AreaLayout = (count, area) => {
+export const mainStack: Layout = (count, area) => {
   if (count === 0) return [];
   if (count === 1) return [area];
   const mainWidth = Math.round(area.width / 2);

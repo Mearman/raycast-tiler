@@ -4,16 +4,10 @@ import { grid } from "./grid";
 import { mainStack } from "./main-stack";
 import { rows } from "./rows";
 import { spiral } from "./spiral";
-import { stackHorizontal, stackVertical } from "./stack";
-import type { Layout, LayoutId, LayoutOptions, Rect } from "./types";
+import type { Layout, LayoutId, Rect } from "./types";
 
-export type { LayoutId, LayoutOptions, Rect } from "./types";
-export {
-  isLayoutId,
-  LAYOUT_IDS,
-  STACK_LAYOUT_IDS,
-  TILING_LAYOUT_IDS,
-} from "./types";
+export type { LayoutId, Rect } from "./types";
+export { isLayoutId, LAYOUT_IDS } from "./types";
 
 const LAYOUTS: Record<LayoutId, Layout> = {
   grid,
@@ -21,8 +15,6 @@ const LAYOUTS: Record<LayoutId, Layout> = {
   rows,
   "main-stack": mainStack,
   spiral,
-  "stack-horizontal": stackHorizontal,
-  "stack-vertical": stackVertical,
 };
 
 /**
@@ -35,10 +27,9 @@ export function layoutWindows(
   count: number,
   area: Rect,
   gap: number,
-  options: LayoutOptions,
 ): Rect[] {
   const half = gap / 2;
-  return LAYOUTS[id](count, inset(area, half), options).map((rect) => {
+  return LAYOUTS[id](count, inset(area, half)).map((rect) => {
     const shrunk = inset(rect, half);
     return {
       x: Math.round(shrunk.x),

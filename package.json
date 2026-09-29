@@ -68,20 +68,6 @@
       "disabledByDefault": true
     },
     {
-      "name": "tile-desktop-stack-horizontal",
-      "title": "Tile Desktop Windows (Stack Horizontal)",
-      "description": "Tile every window on the active desktop in the Stack Horizontal layout, ignoring the layout preference.",
-      "mode": "no-view",
-      "disabledByDefault": true
-    },
-    {
-      "name": "tile-desktop-stack-vertical",
-      "title": "Tile Desktop Windows (Stack Vertical)",
-      "description": "Tile every window on the active desktop in the Stack Vertical layout, ignoring the layout preference.",
-      "mode": "no-view",
-      "disabledByDefault": true
-    },
-    {
       "name": "tile-current-app-grid",
       "title": "Tile Current App Windows (Grid)",
       "description": "Tile every window of the frontmost application in the Grid layout, ignoring the layout preference.",
@@ -115,20 +101,6 @@
       "description": "Tile every window of the frontmost application in the Spiral layout, ignoring the layout preference.",
       "mode": "no-view",
       "disabledByDefault": true
-    },
-    {
-      "name": "tile-current-app-stack-horizontal",
-      "title": "Tile Current App Windows (Stack Horizontal)",
-      "description": "Tile every window of the frontmost application in the Stack Horizontal layout, ignoring the layout preference.",
-      "mode": "no-view",
-      "disabledByDefault": true
-    },
-    {
-      "name": "tile-current-app-stack-vertical",
-      "title": "Tile Current App Windows (Stack Vertical)",
-      "description": "Tile every window of the frontmost application in the Stack Vertical layout, ignoring the layout preference.",
-      "mode": "no-view",
-      "disabledByDefault": true
     }
   ],
   "preferences": [
@@ -159,14 +131,6 @@
         {
           "title": "Spiral",
           "value": "spiral"
-        },
-        {
-          "title": "Stack Horizontal",
-          "value": "stack-horizontal"
-        },
-        {
-          "title": "Stack Vertical",
-          "value": "stack-vertical"
         }
       ]
     },
@@ -178,15 +142,6 @@
       "required": false,
       "default": "0",
       "placeholder": "0"
-    },
-    {
-      "name": "stackOffset",
-      "title": "Stack Offset",
-      "description": "Points of each window left visible in the Stack Horizontal and Stack Vertical layouts. Shrinks automatically so windows stay at least half the screen along the stacking direction. Must be a non-negative number.",
-      "type": "textfield",
-      "required": false,
-      "default": "40",
-      "placeholder": "40"
     },
     {
       "name": "moveDuration",
