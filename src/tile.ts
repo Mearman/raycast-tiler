@@ -7,8 +7,8 @@ import {
 import { showFailureToast } from "@raycast/utils";
 import { animateMoves } from "./animation";
 import { isAllowed } from "./filter";
-import { isLayoutId, layoutWindows, type LayoutId } from "./layouts";
-import { assignToNearestSlots } from "./proximity";
+import { isLayoutId, layoutWindows, type LayoutId, type Rect } from "./layouts";
+import { isOrderId, orderBySlot } from "./ordering";
 import { loadLists } from "./storage";
 
 /** Which windows a tiling command arranges. */
@@ -33,9 +33,14 @@ function isPlaced(window: Window): window is PlacedWindow {
   return window.bounds !== "fullscreen";
 }
 
-function centreOf(window: PlacedWindow): { x: number; y: number } {
+function rectOf(window: PlacedWindow): Rect {
   const { position, size } = window.bounds;
-  return { x: position.x + size.width / 2, y: position.y + size.height / 2 };
+  return {
+    x: position.x,
+    y: position.y,
+    width: size.width,
+    height: size.height,
+  };
 }
 
 async function windowsInScope(scope: Scope): Promise<Window[]> {
@@ -56,12 +61,15 @@ async function tileWindows(
 ): Promise<void> {
   const {
     layout: preferredLayout,
+    windowOrder,
     gap: rawGap,
     moveDuration: rawMoveDuration,
     resizeDuration: rawResizeDuration,
   } = getPreferenceValues<Preferences>();
   const layout = layoutOverride ?? preferredLayout;
   if (!isLayoutId(layout)) throw new Error(`Unknown layout "${layout}"`);
+  if (!isOrderId(windowOrder))
+    throw new Error(`Unknown window order "${windowOrder}"`);
   const gap = parseNonNegative("Gap", rawGap);
   const durations = {
     moveMs: parseNonNegative("Move duration", rawMoveDuration),
@@ -97,7 +105,17 @@ async function tileWindows(
       height: desktop.size.height,
     };
     const rects = layoutWindows(layout, windows.length, area, gap);
-    const bySlot = assignToNearestSlots(windows, centreOf, rects);
+    const bySlot = orderBySlot(
+      windowOrder,
+      windows,
+      rects,
+      {
+        boundsOf: rectOf,
+        isActive: (window) => window.active,
+        bundleIdOf: (window) => window.application?.bundleId,
+      },
+      lists.include,
+    );
     return bySlot.map((window, index) => {
       const rect = rects[index];
       if (rect === undefined)
@@ -117,12 +135,7 @@ async function tileWindows(
   const failures = await animateMoves(
     moves.map((move) => ({
       subject: move,
-      from: {
-        x: move.window.bounds.position.x,
-        y: move.window.bounds.position.y,
-        width: move.window.bounds.size.width,
-        height: move.window.bounds.size.height,
-      },
+      from: rectOf(move.window),
       to: move.rect,
     })),
     ({ window, desktopId }, rect) =>

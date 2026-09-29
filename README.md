@@ -11,7 +11,7 @@ Raycast extension that tiles windows into a chosen layout, with include and excl
 
 ## Layouts
 
-Grid, columns, rows, main and stack, spiral. Each window goes to the layout slot nearest where it already is, chosen so the total distance moved is minimal, so windows keep roughly their current arrangement. Fullscreen windows are skipped. Windows slide into position over the move duration and change size over the resize duration, each eased independently and each instant at 0; the animation lasts as long as the longer of the two. Frames are paced by the clock, so a slow window API drops frames rather than stretching the animation. Layout, gap, move duration and resize duration are extension preferences.
+Grid, columns, rows, main and stack, spiral. Which window goes in which layout slot is the Window Order preference: nearest slot (the default; each window goes to the slot closest to where it is, so total movement is minimal), reading order (top to bottom, then left to right), active first (the focused window takes the first slot, which is the main slot in main and stack), or app priority (windows sort by their application's position in the include list, reorderable in Tiling Lists, with ties in reading order; with an empty include list it is reading order). Fullscreen windows are skipped. Windows slide into position over the move duration and change size over the resize duration, each eased independently and each instant at 0; the animation lasts as long as the longer of the two. Frames are paced by the clock, so a slow window API drops frames rather than stretching the animation. Layout, gap, move duration and resize duration are extension preferences.
 
 ## Requirements
 

@@ -5,18 +5,32 @@ import {
   Color,
   getApplications,
   Icon,
+  Keyboard,
   List,
 } from "@raycast/api";
 import { usePromise } from "@raycast/utils";
-import { toggle, type AppLists } from "./filter";
+import { move, toggle, type AppLists } from "./filter";
 import { loadLists, saveLists } from "./storage";
 
 type Row = { app: Application; bundleId: string };
 
-function section(row: Row, lists: AppLists): "Excluded" | "Included" | "Other" {
+const SECTIONS = ["Excluded", "Included", "Other"] as const;
+type Section = (typeof SECTIONS)[number];
+
+function sectionOf(row: Row, lists: AppLists): Section {
   if (lists.exclude.includes(row.bundleId)) return "Excluded";
   if (lists.include.includes(row.bundleId)) return "Included";
   return "Other";
+}
+
+/** Included applications keep the include list's order, which App Priority uses; the others are alphabetical. */
+function rowsIn(section: Section, rows: Row[], lists: AppLists): Row[] {
+  const inSection = rows.filter((row) => sectionOf(row, lists) === section);
+  if (section !== "Included") return inSection;
+  return inSection.sort(
+    (a, b) =>
+      lists.include.indexOf(a.bundleId) - lists.include.indexOf(b.bundleId),
+  );
 }
 
 export default function Command() {
@@ -42,61 +56,96 @@ export default function Command() {
       searchBarPlaceholder="Search applications"
     >
       {lists &&
-        (["Excluded", "Included", "Other"] as const).map((title) => (
+        SECTIONS.map((section) => (
           <List.Section
-            key={title}
-            title={title}
-            subtitle={title === "Included" ? "Only these are tiled" : undefined}
+            key={section}
+            title={section}
+            subtitle={
+              section === "Included"
+                ? "Only these are tiled, in this order for App Priority"
+                : undefined
+            }
           >
-            {rows
-              .filter((row) => section(row, lists) === title)
-              .map((row) => (
-                <List.Item
-                  key={row.bundleId}
-                  title={row.app.name}
-                  subtitle={row.bundleId}
-                  icon={{ fileIcon: row.app.path }}
-                  accessories={
-                    title === "Excluded"
-                      ? [{ tag: { value: "Excluded", color: Color.Red } }]
-                      : title === "Included"
-                        ? [{ tag: { value: "Included", color: Color.Green } }]
-                        : []
-                  }
-                  actions={
-                    <ActionPanel>
-                      <Action
-                        title={
-                          lists.exclude.includes(row.bundleId)
-                            ? "Remove from Exclude List"
-                            : "Add to Exclude List"
-                        }
-                        icon={Icon.MinusCircle}
-                        onAction={() =>
-                          update({
-                            ...lists,
-                            exclude: toggle(lists.exclude, row.bundleId),
-                          })
-                        }
-                      />
-                      <Action
-                        title={
-                          lists.include.includes(row.bundleId)
-                            ? "Remove from Include List"
-                            : "Add to Include List"
-                        }
-                        icon={Icon.PlusCircle}
-                        onAction={() =>
-                          update({
-                            ...lists,
-                            include: toggle(lists.include, row.bundleId),
-                          })
-                        }
-                      />
-                    </ActionPanel>
-                  }
-                />
-              ))}
+            {rowsIn(section, rows, lists).map((row) => (
+              <List.Item
+                key={row.bundleId}
+                title={row.app.name}
+                subtitle={row.bundleId}
+                icon={{ fileIcon: row.app.path }}
+                accessories={
+                  section === "Excluded"
+                    ? [{ tag: { value: "Excluded", color: Color.Red } }]
+                    : section === "Included"
+                      ? [
+                          {
+                            tag: {
+                              value: `Included ${lists.include.indexOf(row.bundleId) + 1}`,
+                              color: Color.Green,
+                            },
+                          },
+                        ]
+                      : []
+                }
+                actions={
+                  <ActionPanel>
+                    <Action
+                      title={
+                        lists.exclude.includes(row.bundleId)
+                          ? "Remove from Exclude List"
+                          : "Add to Exclude List"
+                      }
+                      icon={Icon.MinusCircle}
+                      onAction={() =>
+                        update({
+                          ...lists,
+                          exclude: toggle(lists.exclude, row.bundleId),
+                        })
+                      }
+                    />
+                    <Action
+                      title={
+                        lists.include.includes(row.bundleId)
+                          ? "Remove from Include List"
+                          : "Add to Include List"
+                      }
+                      icon={Icon.PlusCircle}
+                      onAction={() =>
+                        update({
+                          ...lists,
+                          include: toggle(lists.include, row.bundleId),
+                        })
+                      }
+                    />
+                    {section === "Included" && (
+                      <ActionPanel.Section title="Priority">
+                        <Action
+                          title="Move up in Include List"
+                          icon={Icon.ArrowUp}
+                          shortcut={Keyboard.Shortcut.Common.MoveUp}
+                          onAction={() =>
+                            update({
+                              ...lists,
+                              include: move(lists.include, row.bundleId, -1),
+                            })
+                          }
+                        />
+                        <Action
+                          title="Move Down in Include List"
+                          icon={Icon.ArrowDown}
+                          shortcut={Keyboard.Shortcut.Common.MoveDown}
+                          onAction={() =>
+                            update({
+                              ...lists,
+                              include: move(lists.include, row.bundleId, 1),
+                            })
+                          }
+                        />
+                      </ActionPanel.Section>
+                    )}
+                  </ActionPanel>
+                }
+              />
+            ))}
           </List.Section>
         ))}
     </List>

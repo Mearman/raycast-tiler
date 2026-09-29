@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { LAYOUT_IDS } from "./layouts";
+import { ORDER_IDS } from "./ordering";
 
 type Command = { name: string; disabledByDefault?: boolean };
 type Preference = { name: string; data?: { value: string }[] };
@@ -30,6 +31,13 @@ describe("manifest", () => {
     expect(layout?.data?.map((option) => option.value)).toEqual([
       ...LAYOUT_IDS,
     ]);
+  });
+
+  it("offers every window order in the window order preference", () => {
+    const order = manifest.preferences.find(
+      (pref) => pref.name === "windowOrder",
+    );
+    expect(order?.data?.map((option) => option.value)).toEqual([...ORDER_IDS]);
   });
 
   it.each(SCOPES.flatMap((scope) => LAYOUT_IDS.map((id) => [scope, id])))(

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isAllowed, isAppLists, toggle } from "./filter";
+import { isAllowed, isAppLists, move, toggle } from "./filter";
 
 describe("isAllowed", () => {
   it("allows everything when both lists are empty", () => {
@@ -47,5 +47,22 @@ describe("isAppLists", () => {
     expect(isAppLists({ include: [] })).toBe(false);
     expect(isAppLists(null)).toBe(false);
     expect(isAppLists("x")).toBe(false);
+  });
+});
+
+describe("move", () => {
+  it("moves an entry by the offset", () => {
+    expect(move(["a", "b", "c"], "a", 1)).toEqual(["b", "a", "c"]);
+    expect(move(["a", "b", "c"], "c", -2)).toEqual(["c", "a", "b"]);
+  });
+
+  it("stops at either end", () => {
+    expect(move(["a", "b", "c"], "a", -1)).toEqual(["a", "b", "c"]);
+    expect(move(["a", "b", "c"], "c", 5)).toEqual(["a", "b", "c"]);
+  });
+
+  it("leaves the list alone when the entry is absent", () => {
+    const list = ["a", "b"];
+    expect(move(list, "z", 1)).toBe(list);
   });
 });

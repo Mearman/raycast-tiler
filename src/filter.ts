@@ -32,3 +32,14 @@ export function isAllowed(
 export function toggle(list: string[], id: string): string[] {
   return list.includes(id) ? list.filter((item) => item !== id) : [...list, id];
 }
+
+/**
+ * Moves `id` by `offset` places within `list`, stopping at either end. Returns `list` unchanged when `id` is absent.
+ */
+export function move(list: string[], id: string, offset: number): string[] {
+  const from = list.indexOf(id);
+  if (from === -1) return list;
+  const to = Math.min(list.length - 1, Math.max(0, from + offset));
+  const without = list.filter((item) => item !== id);
+  return [...without.slice(0, to), id, ...without.slice(to)];
+}

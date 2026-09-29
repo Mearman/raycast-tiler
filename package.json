@@ -197,6 +197,32 @@
       ]
     },
     {
+      "name": "windowOrder",
+      "title": "Window Order",
+      "description": "Which window goes in which layout slot. Nearest keeps windows close to where they are; Reading Order goes top to bottom then left to right; Active First puts the focused window in the first slot (the main slot in Main + Stack); App Priority follows the order of the include list.",
+      "type": "dropdown",
+      "required": false,
+      "default": "nearest",
+      "data": [
+        {
+          "title": "Nearest Slot",
+          "value": "nearest"
+        },
+        {
+          "title": "Reading Order",
+          "value": "reading"
+        },
+        {
+          "title": "Active First",
+          "value": "active-first"
+        },
+        {
+          "title": "App Priority",
+          "value": "app-priority"
+        }
+      ]
+    },
+    {
       "name": "gap",
       "title": "Gap",
       "description": "Space in points between windows and around the screen edge. Must be a non-negative number.",
