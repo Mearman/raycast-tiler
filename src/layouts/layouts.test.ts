@@ -89,9 +89,35 @@ describe("layout shapes", () => {
     ]);
   });
 
+  it("places nine windows in a 3x3 grid on a widescreen area", () => {
+    const rects = layoutWindows(
+      "grid",
+      9,
+      { x: 0, y: 0, width: 1920, height: 1080 },
+      0,
+    );
+    expect(new Set(rects.map((rect) => rect.x)).size).toBe(3);
+    expect(new Set(rects.map((rect) => rect.y)).size).toBe(3);
+  });
+
+  it("places seven windows in two rows of four and three", () => {
+    const rects = layoutWindows(
+      "grid",
+      7,
+      { x: 0, y: 0, width: 1920, height: 1080 },
+      0,
+    );
+    expect(rects.filter((rect) => rect.y === 0)).toHaveLength(4);
+    expect(rects.filter((rect) => rect.y !== 0)).toHaveLength(3);
+  });
+
   it("stretches a short final grid row across the full width", () => {
-    const rects = layoutWindows("grid", 3, area, 0);
-    expect(rects[2]).toEqual({ x: 0, y: 400, width: 1000, height: 400 });
+    const rects = layoutWindows("grid", 5, area, 0);
+    const lastRow = rects.filter((rect) => rect.y !== 0);
+    expect(lastRow).toEqual([
+      { x: 0, y: 400, width: 500, height: 400 },
+      { x: 500, y: 400, width: 500, height: 400 },
+    ]);
   });
 
   it("gives the first window the left half in main-stack", () => {
