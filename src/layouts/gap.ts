@@ -14,7 +14,14 @@ export function isGapUnit(value: unknown): value is GapUnit {
  *
  * For `points` the value is a distance in points. For `window` and `screen` it is a percentage, taken per axis: of the window's own width or height, or of the area's width or height. A negative value makes neighbouring windows overlap.
  */
-export type Gap = { value: number; unit: GapUnit };
+export type Gap = {
+  value: number;
+  unit: GapUnit;
+  /** Whether the gap applies along the area's boundary. */
+  edge: boolean;
+  /** Whether the gap applies between neighbouring windows. */
+  between: boolean;
+};
 
 function gapAlong(gap: Gap, axis: "x" | "y", rect: Rect, area: Rect): number {
   if (gap.unit === "points") return gap.value;
@@ -26,13 +33,15 @@ function gapAlong(gap: Gap, axis: "x" | "y", rect: Rect, area: Rect): number {
 /**
  * Shrinks `rect`, one of the rectangles a layout produced for `area`, to leave the gap.
  *
- * A side shared with a neighbour is inset by half the gap, so two neighbours end up a full gap apart (or overlapping by its size when negative). A side on the area's boundary is inset by the full gap, but never outwards: a negative gap does not push windows past the edge.
+ * A side shared with a neighbour is inset by half the gap, so two neighbours end up a full gap apart (or overlapping by its size when negative); it is left flush when `gap.between` is off. A side on the area's boundary is inset by the full gap, but never outwards: a negative gap does not push windows past the edge; it is left flush when `gap.edge` is off.
  */
 export function applyGap(rect: Rect, area: Rect, gap: Gap): Rect {
   const horizontal = gapAlong(gap, "x", rect, area);
   const vertical = gapAlong(gap, "y", rect, area);
-  const inset = (full: number, onBoundary: boolean) =>
-    onBoundary ? Math.max(0, full) : full / 2;
+  const inset = (full: number, onBoundary: boolean) => {
+    if (onBoundary) return gap.edge ? Math.max(0, full) : 0;
+    return gap.between ? full / 2 : 0;
+  };
   const left = inset(horizontal, rect.x === area.x);
   const right = inset(horizontal, rect.x + rect.width === area.x + area.width);
   const top = inset(vertical, rect.y === area.y);

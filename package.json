@@ -254,6 +254,24 @@
       ]
     },
     {
+      "name": "gapAtEdge",
+      "title": "Gap Placement",
+      "label": "Leave a gap at the screen edge",
+      "description": "Apply the gap between windows and the edge of the screen.",
+      "type": "checkbox",
+      "required": false,
+      "default": true
+    },
+    {
+      "name": "gapBetween",
+      "label": "Leave a gap between windows",
+      "description": "Apply the gap between neighbouring windows. Turn off to keep windows flush and only inset from the screen edge.",
+      "type": "checkbox",
+      "required": false,
+      "default": true,
+      "title": "Gap Placement"
+    },
+    {
       "name": "moveDuration",
       "title": "Move Duration",
       "description": "Milliseconds windows take to slide to their new position. 0 moves them instantly. Must be a non-negative number.",

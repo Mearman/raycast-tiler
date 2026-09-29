@@ -3,7 +3,7 @@ import { LAYOUT_IDS, layoutWindows } from "./index";
 import type { Gap } from "./gap";
 import type { Rect } from "./types";
 
-const NO_GAP: Gap = { value: 0, unit: "points" };
+const NO_GAP: Gap = { value: 0, unit: "points", edge: true, between: true };
 
 const SCREEN: Rect = { x: 0, y: 0, width: 1920, height: 1080 };
 
@@ -63,7 +63,12 @@ describe.each(LAYOUT_IDS)("%s layout", (id) => {
   it("leaves the requested gap around the edge and between windows", () => {
     const area = SCREEN;
     const gap = 10;
-    const rects = layoutWindows(id, 4, area, { value: gap, unit: "points" });
+    const rects = layoutWindows(id, 4, area, {
+      value: gap,
+      unit: "points",
+      edge: true,
+      between: true,
+    });
     expect(Math.min(...rects.map((rect) => rect.x))).toBe(area.x + gap);
     expect(Math.min(...rects.map((rect) => rect.y))).toBe(area.y + gap);
     expect(Math.max(...rects.map((rect) => rect.x + rect.width))).toBe(

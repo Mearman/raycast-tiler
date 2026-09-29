@@ -78,6 +78,8 @@ async function tileWindows(
     windowOrder,
     gap: rawGap,
     gapUnit,
+    gapAtEdge,
+    gapBetween,
     moveDuration: rawMoveDuration,
     resizeDuration: rawResizeDuration,
   } = getPreferenceValues<Preferences>();
@@ -86,7 +88,12 @@ async function tileWindows(
   if (!isOrderId(windowOrder))
     throw new Error(`Unknown window order "${windowOrder}"`);
   if (!isGapUnit(gapUnit)) throw new Error(`Unknown gap unit "${gapUnit}"`);
-  const gap = { value: parseNumber("Gap", rawGap), unit: gapUnit };
+  const gap = {
+    value: parseNumber("Gap", rawGap),
+    unit: gapUnit,
+    edge: gapAtEdge,
+    between: gapBetween,
+  };
   const durations = {
     moveMs: parseNonNegative("Move duration", rawMoveDuration),
     resizeMs: parseNonNegative("Resize duration", rawResizeDuration),

@@ -4,7 +4,12 @@ import { layoutWindows } from "./index";
 import type { Rect } from "./types";
 
 const AREA: Rect = { x: 0, y: 0, width: 1000, height: 800 };
-const points = (value: number): Gap => ({ value, unit: "points" });
+const points = (value: number): Gap => ({
+  value,
+  unit: "points",
+  edge: true,
+  between: true,
+});
 
 describe("applyGap", () => {
   const left: Rect = { x: 0, y: 0, width: 500, height: 800 };
@@ -41,8 +46,36 @@ describe("applyGap", () => {
     expect(b.y + b.height).toBe(800);
   });
 
+  it("leaves the boundary flush when the edge gap is off", () => {
+    const gap: Gap = { ...points(20), edge: false };
+    expect(applyGap(left, AREA, gap)).toEqual({
+      x: 0,
+      y: 0,
+      width: 490,
+      height: 800,
+    });
+  });
+
+  it("leaves shared sides flush when the between gap is off", () => {
+    const gap: Gap = { ...points(20), between: false };
+    expect(applyGap(left, AREA, gap)).toEqual({
+      x: 20,
+      y: 20,
+      width: 480,
+      height: 760,
+    });
+    const a = applyGap(left, AREA, gap);
+    const b = applyGap(right, AREA, gap);
+    expect(b.x - (a.x + a.width)).toBe(0);
+  });
+
+  it("applies no gap at all when both are off", () => {
+    const gap: Gap = { ...points(20), edge: false, between: false };
+    expect(applyGap(left, AREA, gap)).toEqual(left);
+  });
+
   it("measures a window percentage against each window's own size, per axis", () => {
-    const gap: Gap = { value: 10, unit: "window" };
+    const gap: Gap = { ...points(10), unit: "window" };
     expect(applyGap(left, AREA, gap)).toEqual({
       x: 50,
       y: 80,
@@ -52,7 +85,7 @@ describe("applyGap", () => {
   });
 
   it("measures a screen percentage against the area's size, per axis", () => {
-    const gap: Gap = { value: 10, unit: "screen" };
+    const gap: Gap = { ...points(10), unit: "screen" };
     expect(applyGap(left, AREA, gap)).toEqual({
       x: 100,
       y: 80,
@@ -82,7 +115,7 @@ describe("layoutWindows gaps", () => {
       "no room",
     );
     expect(() =>
-      layoutWindows("columns", 2, AREA, { value: 100, unit: "screen" }),
+      layoutWindows("columns", 2, AREA, { ...points(100), unit: "screen" }),
     ).toThrow("no room");
   });
 });
