@@ -2,8 +2,14 @@ import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { GAP_UNITS, LAYOUT_IDS } from "./layouts";
 import { ORDER_IDS } from "./ordering";
+import { REORDER_ACTIONS } from "./reorder";
 
-type Command = { name: string; disabledByDefault?: boolean };
+type Argument = { name: string; data?: { value: string }[] };
+type Command = {
+  name: string;
+  disabledByDefault?: boolean;
+  arguments?: Argument[];
+};
 type Preference = { name: string; data?: { value: string }[] };
 type Manifest = { commands: Command[]; preferences: Preference[] };
 
@@ -36,6 +42,21 @@ describe("manifest", () => {
   it("offers every gap unit in the gap unit preference", () => {
     const unit = manifest.preferences.find((pref) => pref.name === "gapUnit");
     expect(unit?.data?.map((option) => option.value)).toEqual([...GAP_UNITS]);
+  });
+
+  it("offers every reorder action in the Move Window argument", () => {
+    const command = manifest.commands.find((c) => c.name === "move-window");
+    const action = command?.arguments?.find((arg) => arg.name === "action");
+    expect(action?.data?.map((option) => option.value)).toEqual([
+      ...REORDER_ACTIONS,
+    ]);
+  });
+
+  it.each(REORDER_ACTIONS)("registers a dedicated command for %s", (action) => {
+    const name = action.startsWith("rotate-")
+      ? `rotate-windows-${action.slice("rotate-".length)}`
+      : `move-window-${action}`;
+    expect(manifest.commands.map((command) => command.name)).toContain(name);
   });
 
   it("offers every window order in the window order preference", () => {

@@ -208,6 +208,107 @@
       ]
     },
     {
+      "name": "move-window-left",
+      "title": "Move Window Left",
+      "description": "Swap the focused window with the window to its left in the current layout.",
+      "mode": "no-view",
+      "keywords": [
+        "swap",
+        "west"
+      ]
+    },
+    {
+      "name": "move-window-right",
+      "title": "Move Window Right",
+      "description": "Swap the focused window with the window to its right in the current layout.",
+      "mode": "no-view",
+      "keywords": [
+        "swap",
+        "east"
+      ]
+    },
+    {
+      "name": "move-window-up",
+      "title": "Move Window Up",
+      "description": "Swap the focused window with the window above it in the current layout.",
+      "mode": "no-view",
+      "keywords": [
+        "swap",
+        "north"
+      ]
+    },
+    {
+      "name": "move-window-down",
+      "title": "Move Window Down",
+      "description": "Swap the focused window with the window below it in the current layout.",
+      "mode": "no-view",
+      "keywords": [
+        "swap",
+        "south"
+      ]
+    },
+    {
+      "name": "move-window",
+      "title": "Move Window",
+      "description": "Move the focused window within the current layout by choosing a direction or an order change.",
+      "mode": "no-view",
+      "keywords": [
+        "swap",
+        "reorder",
+        "direction"
+      ],
+      "arguments": [
+        {
+          "name": "action",
+          "type": "dropdown",
+          "placeholder": "Direction or order",
+          "required": true,
+          "data": [
+            {
+              "title": "Left",
+              "value": "left"
+            },
+            {
+              "title": "Right",
+              "value": "right"
+            },
+            {
+              "title": "Up",
+              "value": "up"
+            },
+            {
+              "title": "Down",
+              "value": "down"
+            },
+            {
+              "title": "Forward",
+              "value": "forward"
+            },
+            {
+              "title": "Back",
+              "value": "back"
+            },
+            {
+              "title": "To Start",
+              "value": "start"
+            },
+            {
+              "title": "To End",
+              "value": "end"
+            },
+            {
+              "title": "Rotate Forward",
+              "value": "rotate-forward"
+            },
+            {
+              "title": "Rotate Back",
+              "value": "rotate-back"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "rotate-windows-forward",
       "title": "Rotate Windows Forward",
       "description": "Move every window one slot forward in the current layout, the last to the first.",

@@ -15,7 +15,13 @@ import {
   type Rect,
 } from "./layouts";
 import { isOrderId, orderBySlot, type OrderId } from "./ordering";
-import { moveActiveTo, rotate, swapActive } from "./reorder";
+import {
+  moveActiveTo,
+  rotate,
+  swapActive,
+  swapInDirection,
+  type ReorderAction,
+} from "./reorder";
 import type { Scope } from "./scope";
 import { loadLastTiling, loadLists, saveLastTiling } from "./storage";
 
@@ -73,6 +79,7 @@ async function windowsInScope(scope: Scope): Promise<Window[]> {
 /** Rearranges windows already in slot order; `undefined` means this group has nothing to rearrange. */
 type Rearrange = (
   ordered: PlacedWindow[],
+  slots: Rect[],
   isFocused: (window: PlacedWindow) => boolean,
 ) => PlacedWindow[] | undefined;
 
@@ -164,7 +171,7 @@ async function tileWindows(request: TileRequest): Promise<void> {
       lists.include,
     );
     const bySlot =
-      rearrange === undefined ? ordered : rearrange(ordered, isFocused);
+      rearrange === undefined ? ordered : rearrange(ordered, rects, isFocused);
     if (bySlot === undefined) return [];
     return bySlot.map((window, index) => {
       const rect = rects[index];
@@ -242,21 +249,19 @@ export async function runTile(scope: Scope, layout?: LayoutId): Promise<void> {
   }
 }
 
-/** A change to the order of the windows in the current layout. */
-export type ReorderAction =
-  | "move-forward"
-  | "move-back"
-  | "move-start"
-  | "move-end"
-  | "rotate-forward"
-  | "rotate-back";
-
 const REARRANGE: Record<ReorderAction, Rearrange> = {
-  "move-forward": (ordered, isFocused) => swapActive(ordered, isFocused, 1),
-  "move-back": (ordered, isFocused) => swapActive(ordered, isFocused, -1),
-  "move-start": (ordered, isFocused) =>
-    moveActiveTo(ordered, isFocused, "start"),
-  "move-end": (ordered, isFocused) => moveActiveTo(ordered, isFocused, "end"),
+  left: (ordered, slots, isFocused) =>
+    swapInDirection(ordered, slots, isFocused, "left"),
+  right: (ordered, slots, isFocused) =>
+    swapInDirection(ordered, slots, isFocused, "right"),
+  up: (ordered, slots, isFocused) =>
+    swapInDirection(ordered, slots, isFocused, "up"),
+  down: (ordered, slots, isFocused) =>
+    swapInDirection(ordered, slots, isFocused, "down"),
+  forward: (ordered, _, isFocused) => swapActive(ordered, isFocused, 1),
+  back: (ordered, _, isFocused) => swapActive(ordered, isFocused, -1),
+  start: (ordered, _, isFocused) => moveActiveTo(ordered, isFocused, "start"),
+  end: (ordered, _, isFocused) => moveActiveTo(ordered, isFocused, "end"),
   "rotate-forward": (ordered) => rotate(ordered, 1),
   "rotate-back": (ordered) => rotate(ordered, -1),
 };
