@@ -1,3 +1,10 @@
+## [1.1.0](https://github.com/Mearman/raycast-tiler/compare/v1.0.1...v1.1.0) (2026-09-29)
+
+### Features
+
+* add a configurable grid balance and break grid ties by screen orientation ([92efca0](https://github.com/Mearman/raycast-tiler/commit/92efca0a4932218a79cd7748fb7c6b18233f1c81))
+* add a toggle to animate windows one at a time instead of together ([80d1613](https://github.com/Mearman/raycast-tiler/commit/80d16131a26f307d02b5dfe493e311f9e7d96170))
+
 ## [1.0.1](https://github.com/Mearman/raycast-tiler/compare/v1.0.0...v1.0.1) (2026-09-29)
 
 ### Bug Fixes
