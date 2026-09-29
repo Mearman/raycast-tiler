@@ -1,18 +1,12 @@
 {
-  "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "window-tiler",
-  "title": "Window Tiler",
   "description": "Tile windows into grid, column, row, main-stack and spiral layouts, with include and exclude lists.",
-  "icon": "extension-icon.png",
   "author": "mearman",
-  "platforms": [
-    "macOS"
-  ],
+  "$schema": "https://www.raycast.com/schemas/extension.json",
   "categories": [
     "Productivity",
     "System"
   ],
-  "license": "MIT",
   "commands": [
     {
       "name": "tile-current-app",
@@ -20,9 +14,9 @@
       "description": "Tile every window of the frontmost application in the layout chosen in preferences, or in the layout given as the optional argument.",
       "mode": "no-view",
       "keywords": [
-        "current",
         "application",
         "arrange",
+        "current",
         "layout"
       ],
       "arguments": [
@@ -62,10 +56,10 @@
       "description": "Tile every window on the active desktop in the layout chosen in preferences, or in the layout given as the optional argument.",
       "mode": "no-view",
       "keywords": [
-        "desktop",
-        "screen",
         "arrange",
-        "layout"
+        "desktop",
+        "layout",
+        "screen"
       ],
       "arguments": [
         {
@@ -110,10 +104,10 @@
       "description": "Tile every window on the active desktop as Grid, whatever the layout preference says.",
       "mode": "no-view",
       "keywords": [
-        "desktop",
-        "screen",
         "arrange",
-        "layout"
+        "desktop",
+        "layout",
+        "screen"
       ],
       "disabledByDefault": true
     },
@@ -123,10 +117,10 @@
       "description": "Tile every window on the active desktop as Columns, whatever the layout preference says.",
       "mode": "no-view",
       "keywords": [
-        "desktop",
-        "screen",
         "arrange",
-        "layout"
+        "desktop",
+        "layout",
+        "screen"
       ],
       "disabledByDefault": true
     },
@@ -136,10 +130,10 @@
       "description": "Tile every window on the active desktop as Rows, whatever the layout preference says.",
       "mode": "no-view",
       "keywords": [
-        "desktop",
-        "screen",
         "arrange",
-        "layout"
+        "desktop",
+        "layout",
+        "screen"
       ],
       "disabledByDefault": true
     },
@@ -149,10 +143,10 @@
       "description": "Tile every window on the active desktop as Main and Stack, whatever the layout preference says.",
       "mode": "no-view",
       "keywords": [
-        "desktop",
-        "screen",
         "arrange",
-        "layout"
+        "desktop",
+        "layout",
+        "screen"
       ],
       "disabledByDefault": true
     },
@@ -162,10 +156,10 @@
       "description": "Tile every window on the active desktop as Spiral, whatever the layout preference says.",
       "mode": "no-view",
       "keywords": [
-        "desktop",
-        "screen",
         "arrange",
-        "layout"
+        "desktop",
+        "layout",
+        "screen"
       ],
       "disabledByDefault": true
     },
@@ -175,9 +169,9 @@
       "description": "Tile every window of the frontmost application as Grid, whatever the layout preference says.",
       "mode": "no-view",
       "keywords": [
-        "current",
         "application",
         "arrange",
+        "current",
         "layout"
       ],
       "disabledByDefault": true
@@ -188,9 +182,9 @@
       "description": "Tile every window of the frontmost application as Columns, whatever the layout preference says.",
       "mode": "no-view",
       "keywords": [
-        "current",
         "application",
         "arrange",
+        "current",
         "layout"
       ],
       "disabledByDefault": true
@@ -201,9 +195,9 @@
       "description": "Tile every window of the frontmost application as Rows, whatever the layout preference says.",
       "mode": "no-view",
       "keywords": [
-        "current",
         "application",
         "arrange",
+        "current",
         "layout"
       ],
       "disabledByDefault": true
@@ -214,9 +208,9 @@
       "description": "Tile every window of the frontmost application as Main and Stack, whatever the layout preference says.",
       "mode": "no-view",
       "keywords": [
-        "current",
         "application",
         "arrange",
+        "current",
         "layout"
       ],
       "disabledByDefault": true
@@ -227,9 +221,9 @@
       "description": "Tile every window of the frontmost application as Spiral, whatever the layout preference says.",
       "mode": "no-view",
       "keywords": [
-        "current",
         "application",
         "arrange",
+        "current",
         "layout"
       ],
       "disabledByDefault": true
@@ -240,9 +234,9 @@
       "description": "Swap the focused window with the next one in the current layout.",
       "mode": "no-view",
       "keywords": [
-        "swap",
         "next",
-        "order"
+        "order",
+        "swap"
       ],
       "disabledByDefault": true
     },
@@ -252,9 +246,9 @@
       "description": "Swap the focused window with the previous one in the current layout.",
       "mode": "no-view",
       "keywords": [
-        "swap",
+        "order",
         "previous",
-        "order"
+        "swap"
       ],
       "disabledByDefault": true
     },
@@ -264,8 +258,8 @@
       "description": "Move the focused window to the first slot in the current layout, shifting the others along.",
       "mode": "no-view",
       "keywords": [
-        "first",
         "beginning",
+        "first",
         "order"
       ],
       "disabledByDefault": true
@@ -283,7 +277,7 @@
     },
     {
       "name": "move-window-left",
-      "title": "Move Window Left",
+      "title": "Move Window Leftward",
       "description": "Swap the focused window with the window to its left in the current layout.",
       "mode": "no-view",
       "keywords": [
@@ -294,34 +288,34 @@
     },
     {
       "name": "move-window-right",
-      "title": "Move Window Right",
+      "title": "Move Window Rightward",
       "description": "Swap the focused window with the window to its right in the current layout.",
       "mode": "no-view",
       "keywords": [
-        "swap",
-        "east"
+        "east",
+        "swap"
       ],
       "disabledByDefault": true
     },
     {
       "name": "move-window-up",
-      "title": "Move Window Up",
+      "title": "Move Window Upward",
       "description": "Swap the focused window with the window above it in the current layout.",
       "mode": "no-view",
       "keywords": [
-        "swap",
-        "north"
+        "north",
+        "swap"
       ],
       "disabledByDefault": true
     },
     {
       "name": "move-window-down",
-      "title": "Move Window Down",
+      "title": "Move Window Downward",
       "description": "Swap the focused window with the window below it in the current layout.",
       "mode": "no-view",
       "keywords": [
-        "swap",
-        "south"
+        "south",
+        "swap"
       ],
       "disabledByDefault": true
     },
@@ -331,9 +325,9 @@
       "description": "Move the focused window within the current layout by choosing a direction or an order change.",
       "mode": "no-view",
       "keywords": [
-        "swap",
+        "direction",
         "reorder",
-        "direction"
+        "swap"
       ],
       "arguments": [
         {
@@ -404,10 +398,42 @@
       "mode": "no-view",
       "keywords": [
         "cycle",
-        "previous",
-        "order"
+        "order",
+        "previous"
       ]
     }
+  ],
+  "dependencies": {
+    "@raycast/api": "2.5.3",
+    "@raycast/utils": "2.3.2"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "21.2.3",
+    "@commitlint/config-conventional": "21.2.3",
+    "@eslint/js": "10.0.1",
+    "@exadev/eslint-config": "2.23.0",
+    "@raycast/eslint-plugin": "2.2.0",
+    "@stryker-mutator/api": "10.0.0",
+    "@stryker-mutator/core": "10.0.0",
+    "@stryker-mutator/typescript-checker": "10.0.0",
+    "@types/node": "26.6.3",
+    "@types/react": "19.3.0",
+    "@vitest/coverage-v8": "5.0.2",
+    "eslint": "10.11.0",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-prettier": "5.5.6",
+    "globals": "17.12.0",
+    "husky": "9.1.7",
+    "lint-staged": "17.6.0",
+    "prettier": "3.9.9",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.71.0",
+    "vitest": "5.0.2"
+  },
+  "icon": "extension-icon.png",
+  "license": "MIT",
+  "platforms": [
+    "macOS"
   ],
   "preferences": [
     {
@@ -538,20 +564,12 @@
     "build": "ray build",
     "dev": "ray develop",
     "lint": "ray lint",
-    "typecheck": "ray build && tsc --noEmit",
-    "test": "vitest run"
+    "mutation": "stryker run stryker.config.ts",
+    "prepare": "husky",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "ray build && tsc --noEmit"
   },
-  "dependencies": {
-    "@raycast/api": "2.5.3",
-    "@raycast/utils": "2.3.2"
-  },
-  "devDependencies": {
-    "@raycast/eslint-config": "2.2.0",
-    "@types/node": "26.6.3",
-    "@types/react": "19.3.0",
-    "eslint": "10.11.0",
-    "prettier": "3.9.9",
-    "typescript": "6.0.3",
-    "vitest": "5.0.2"
-  }
+  "title": "Window Tiler",
+  "type": "module"
 }

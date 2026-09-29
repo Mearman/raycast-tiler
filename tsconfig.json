@@ -1,19 +1,19 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "include": ["src/**/*", "raycast-env.d.ts"],
   "compilerOptions": {
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
     "lib": ["es2024"],
-    "types": ["node"],
     "module": "esnext",
     "moduleResolution": "bundler",
-    "target": "es2023",
-    "strict": true,
+    "noEmit": true,
     "noUncheckedIndexedAccess": true,
-    "isolatedModules": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
     "resolveJsonModule": true,
-    "jsx": "react-jsx",
-    "noEmit": true
-  }
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "es2023",
+    "types": ["node"]
+  },
+  "include": ["src/**/*", "*.config.ts", "types/**/*", "raycast-env.d.ts"]
 }
