@@ -1,5 +1,7 @@
 {
   "$schema": "https://turborepo.com/schema.json",
+  // Turborepo otherwise rewrites AGENTS.md with its own managed block whenever it detects an AI agent, and in doing so replaces the AGENTS.md symlink to README.md with a regular file.
+  "agentGuidance": false,
   "globalDependencies": ["pnpm-lock.yaml"],
   // Every task name is the underscore-prefixed script that holds the real command. The public script of the same name without the underscore runs turbo, so calling the public name from here would make turbo start turbo again, the recursive case Turborepo's documentation warns against.
   "tasks": {

@@ -86,6 +86,7 @@ Raycast-bound:
 - Raycast preferences cannot hold a button, and the API cannot enable or disable commands.
 - Stryker only loads `stryker.config.ts` when it is named: `stryker run stryker.config.ts`. Without the path, Stryker ignores the file and mutates every source file.
 - The semantic-release notes generator loads an older `conventional-changelog-writer` that cannot render the `conventionalcommits` preset, which produces a changelog with a version heading and nothing under it. `pnpm-workspace.yaml` overrides the writer to a newer major. Remove the override only after checking that the notes still list every section.
+- Turborepo writes its own managed block into `AGENTS.md` when it detects an AI agent, and doing so replaces the symlink with a regular file. `"agentGuidance": false` in `turbo.json` stops that. If `AGENTS.md` is ever a regular file again, restore it with `ln -sf README.md AGENTS.md`.
 - TypeScript is pinned to version 6, because `typescript-eslint` does not support version 7.
 - `pnpm install` runs `prepare`, and husky would set a local hooks path that replaces a machine-wide hook dispatcher configured in the global git configuration. The `prepare` script therefore runs husky only when no hooks path is configured. Where a global dispatcher exists, it runs the scripts in `.husky/` itself. `pnpm-workspace.yaml` marks the `esbuild` build script as not allowed.
 
