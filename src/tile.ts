@@ -54,11 +54,15 @@ async function tileWindows(scope: Scope): Promise<void> {
   const {
     layout,
     gap: rawGap,
-    animationDuration: rawDuration,
+    moveDuration: rawMoveDuration,
+    resizeDuration: rawResizeDuration,
   } = getPreferenceValues<Preferences>();
   if (!isLayoutId(layout)) throw new Error(`Unknown layout "${layout}"`);
   const gap = parseNonNegative("Gap", rawGap);
-  const duration = parseNonNegative("Animation duration", rawDuration);
+  const durations = {
+    moveMs: parseNonNegative("Move duration", rawMoveDuration),
+    resizeMs: parseNonNegative("Resize duration", rawResizeDuration),
+  };
 
   const [lists, desktops, scoped] = await Promise.all([
     loadLists(),
@@ -126,7 +130,7 @@ async function tileWindows(scope: Scope): Promise<void> {
           size: { width: rect.width, height: rect.height },
         },
       }),
-    duration,
+    durations,
   );
 
   const tiled = moves.length - failures.size;

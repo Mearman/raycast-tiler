@@ -74,9 +74,18 @@
       "placeholder": "0"
     },
     {
-      "name": "animationDuration",
-      "title": "Animation Duration",
-      "description": "Milliseconds windows take to slide and resize into place. 0 moves them instantly. Must be a non-negative number.",
+      "name": "moveDuration",
+      "title": "Move Duration",
+      "description": "Milliseconds windows take to slide to their new position. 0 moves them instantly. Must be a non-negative number.",
+      "type": "textfield",
+      "required": false,
+      "default": "200",
+      "placeholder": "200"
+    },
+    {
+      "name": "resizeDuration",
+      "title": "Resize Duration",
+      "description": "Milliseconds windows take to change size. 0 resizes them instantly. Must be a non-negative number.",
       "type": "textfield",
       "required": false,
       "default": "200",
