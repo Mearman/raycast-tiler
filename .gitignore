@@ -4,3 +4,7 @@ raycast-env.d.ts
 coverage
 reports
 .stryker-tmp
+!CLAUDE.md
+!AGENTS.md
+!**/CLAUDE.md
+!**/AGENTS.md
