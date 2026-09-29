@@ -1,9 +1,9 @@
-import type { Layout, Rect } from "./types";
+import type { AreaLayout, Rect } from "./types";
 
 /**
  * Each window takes half of the space still free, working clockwise: left half, then the top half of what remains, then its right half, then its bottom half, and so on. The last window takes whatever is left.
  */
-export const spiral: Layout = (count, area) => {
+export const spiral: AreaLayout = (count, area) => {
   const result: Rect[] = [];
   let free = area;
   for (let index = 0; index < count; index++) {

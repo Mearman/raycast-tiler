@@ -1,8 +1,8 @@
 import { splitSpan } from "./geometry";
-import type { Layout } from "./types";
+import type { AreaLayout } from "./types";
 
 /** Equal-width windows side by side. */
-export const columns: Layout = (count, area) =>
+export const columns: AreaLayout = (count, area) =>
   splitSpan(area.x, area.width, count).map(({ start, size }) => ({
     x: start,
     y: area.y,

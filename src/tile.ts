@@ -7,7 +7,7 @@ import {
 import { showFailureToast } from "@raycast/utils";
 import { animateMoves } from "./animation";
 import { isAllowed } from "./filter";
-import { isLayoutId, layoutWindows } from "./layouts";
+import { isLayoutId, layoutWindows, type LayoutId } from "./layouts";
 import { assignToNearestSlots } from "./proximity";
 import { loadLists } from "./storage";
 
@@ -50,15 +50,21 @@ async function windowsInScope(scope: Scope): Promise<Window[]> {
   return windows.filter((window) => window.application?.bundleId === bundleId);
 }
 
-async function tileWindows(scope: Scope): Promise<void> {
+async function tileWindows(
+  scope: Scope,
+  layoutOverride: LayoutId | undefined,
+): Promise<void> {
   const {
-    layout,
+    layout: preferredLayout,
     gap: rawGap,
+    stackOffset: rawStackOffset,
     moveDuration: rawMoveDuration,
     resizeDuration: rawResizeDuration,
   } = getPreferenceValues<Preferences>();
+  const layout = layoutOverride ?? preferredLayout;
   if (!isLayoutId(layout)) throw new Error(`Unknown layout "${layout}"`);
   const gap = parseNonNegative("Gap", rawGap);
+  const stackOffset = parseNonNegative("Stack offset", rawStackOffset);
   const durations = {
     moveMs: parseNonNegative("Move duration", rawMoveDuration),
     resizeMs: parseNonNegative("Resize duration", rawResizeDuration),
@@ -92,7 +98,9 @@ async function tileWindows(scope: Scope): Promise<void> {
       width: desktop.size.width,
       height: desktop.size.height,
     };
-    const rects = layoutWindows(layout, windows.length, area, gap);
+    const rects = layoutWindows(layout, windows.length, area, gap, {
+      stackOffset,
+    });
     const bySlot = assignToNearestSlots(windows, centreOf, rects);
     return bySlot.map((window, index) => {
       const rect = rects[index];
@@ -152,10 +160,14 @@ async function tileWindows(scope: Scope): Promise<void> {
   });
 }
 
-/** Runs a tiling command, reporting any error as a failure toast. */
-export async function runTile(scope: Scope): Promise<void> {
+/**
+ * Runs a tiling command, reporting any error as a failure toast.
+ *
+ * Uses `layout` when given, otherwise the layout preference.
+ */
+export async function runTile(scope: Scope, layout?: LayoutId): Promise<void> {
   try {
-    await tileWindows(scope);
+    await tileWindows(scope, layout);
   } catch (error) {
     await showFailureToast(error, { title: "Could not tile windows" });
   }

@@ -3,6 +3,7 @@
   "include": ["src/**/*", "raycast-env.d.ts"],
   "compilerOptions": {
     "lib": ["es2024"],
+    "types": ["node"],
     "module": "esnext",
     "moduleResolution": "bundler",
     "target": "es2023",

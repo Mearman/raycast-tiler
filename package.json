@@ -31,6 +31,104 @@
       "title": "Manage Tiling Lists",
       "description": "Choose which applications are included in or excluded from tiling.",
       "mode": "view"
+    },
+    {
+      "name": "tile-desktop-grid",
+      "title": "Tile Desktop Windows (Grid)",
+      "description": "Tile every window on the active desktop in the Grid layout, ignoring the layout preference.",
+      "mode": "no-view",
+      "disabledByDefault": true
+    },
+    {
+      "name": "tile-desktop-columns",
+      "title": "Tile Desktop Windows (Columns)",
+      "description": "Tile every window on the active desktop in the Columns layout, ignoring the layout preference.",
+      "mode": "no-view",
+      "disabledByDefault": true
+    },
+    {
+      "name": "tile-desktop-rows",
+      "title": "Tile Desktop Windows (Rows)",
+      "description": "Tile every window on the active desktop in the Rows layout, ignoring the layout preference.",
+      "mode": "no-view",
+      "disabledByDefault": true
+    },
+    {
+      "name": "tile-desktop-main-stack",
+      "title": "Tile Desktop Windows (Main and Stack)",
+      "description": "Tile every window on the active desktop in the Main and Stack layout, ignoring the layout preference.",
+      "mode": "no-view",
+      "disabledByDefault": true
+    },
+    {
+      "name": "tile-desktop-spiral",
+      "title": "Tile Desktop Windows (Spiral)",
+      "description": "Tile every window on the active desktop in the Spiral layout, ignoring the layout preference.",
+      "mode": "no-view",
+      "disabledByDefault": true
+    },
+    {
+      "name": "tile-desktop-stack-horizontal",
+      "title": "Tile Desktop Windows (Stack Horizontal)",
+      "description": "Tile every window on the active desktop in the Stack Horizontal layout, ignoring the layout preference.",
+      "mode": "no-view",
+      "disabledByDefault": true
+    },
+    {
+      "name": "tile-desktop-stack-vertical",
+      "title": "Tile Desktop Windows (Stack Vertical)",
+      "description": "Tile every window on the active desktop in the Stack Vertical layout, ignoring the layout preference.",
+      "mode": "no-view",
+      "disabledByDefault": true
+    },
+    {
+      "name": "tile-current-app-grid",
+      "title": "Tile Current App Windows (Grid)",
+      "description": "Tile every window of the frontmost application in the Grid layout, ignoring the layout preference.",
+      "mode": "no-view",
+      "disabledByDefault": true
+    },
+    {
+      "name": "tile-current-app-columns",
+      "title": "Tile Current App Windows (Columns)",
+      "description": "Tile every window of the frontmost application in the Columns layout, ignoring the layout preference.",
+      "mode": "no-view",
+      "disabledByDefault": true
+    },
+    {
+      "name": "tile-current-app-rows",
+      "title": "Tile Current App Windows (Rows)",
+      "description": "Tile every window of the frontmost application in the Rows layout, ignoring the layout preference.",
+      "mode": "no-view",
+      "disabledByDefault": true
+    },
+    {
+      "name": "tile-current-app-main-stack",
+      "title": "Tile Current App Windows (Main and Stack)",
+      "description": "Tile every window of the frontmost application in the Main and Stack layout, ignoring the layout preference.",
+      "mode": "no-view",
+      "disabledByDefault": true
+    },
+    {
+      "name": "tile-current-app-spiral",
+      "title": "Tile Current App Windows (Spiral)",
+      "description": "Tile every window of the frontmost application in the Spiral layout, ignoring the layout preference.",
+      "mode": "no-view",
+      "disabledByDefault": true
+    },
+    {
+      "name": "tile-current-app-stack-horizontal",
+      "title": "Tile Current App Windows (Stack Horizontal)",
+      "description": "Tile every window of the frontmost application in the Stack Horizontal layout, ignoring the layout preference.",
+      "mode": "no-view",
+      "disabledByDefault": true
+    },
+    {
+      "name": "tile-current-app-stack-vertical",
+      "title": "Tile Current App Windows (Stack Vertical)",
+      "description": "Tile every window of the frontmost application in the Stack Vertical layout, ignoring the layout preference.",
+      "mode": "no-view",
+      "disabledByDefault": true
     }
   ],
   "preferences": [
@@ -61,6 +159,14 @@
         {
           "title": "Spiral",
           "value": "spiral"
+        },
+        {
+          "title": "Stack Horizontal",
+          "value": "stack-horizontal"
+        },
+        {
+          "title": "Stack Vertical",
+          "value": "stack-vertical"
         }
       ]
     },
@@ -72,6 +178,15 @@
       "required": false,
       "default": "0",
       "placeholder": "0"
+    },
+    {
+      "name": "stackOffset",
+      "title": "Stack Offset",
+      "description": "Points of each window left visible in the Stack Horizontal and Stack Vertical layouts. Shrinks automatically so windows stay at least half the screen along the stacking direction. Must be a non-negative number.",
+      "type": "textfield",
+      "required": false,
+      "default": "40",
+      "placeholder": "40"
     },
     {
       "name": "moveDuration",

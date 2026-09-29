@@ -1,6 +1,6 @@
 import { columns } from "./columns";
 import { splitSpan } from "./geometry";
-import type { Layout } from "./types";
+import type { AreaLayout } from "./types";
 
 /**
  * How far the worst-shaped cell of a `columnCount`-wide grid is from the shape of the area itself, as an absolute log ratio.
@@ -19,7 +19,7 @@ function worstDistortion(count: number, columnCount: number): number {
  *
  * The column count is the one whose worst cell is closest to the area's own shape, so a count that fits a full grid (nine windows as 3x3) beats one that leaves a lone window stretched across a final row. A short final row still stretches its windows across the full width so no space is left empty.
  */
-export const grid: Layout = (count, area) => {
+export const grid: AreaLayout = (count, area) => {
   if (count === 0) return [];
   const candidates = Array.from({ length: count }, (_, index) => index + 1);
   const columnCount = candidates.reduce((best, candidate) =>

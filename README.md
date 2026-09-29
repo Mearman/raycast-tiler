@@ -6,11 +6,12 @@ Raycast extension that tiles windows into a chosen layout, with include and excl
 
 - **Tile Current App Windows** tiles every window of the frontmost application.
 - **Tile Desktop Windows** tiles every window on the active desktop.
+- **Tile Desktop Windows (Layout)** and **Tile Current App Windows (Layout)**, one pair per layout, ignore the layout preference and always use their own layout. They are disabled by default so only the two commands above appear in root search; enable the ones you want in Raycast's extension preferences. The manifest cannot vary by build, so development imports disable them too on first install and new commands are disabled the first time they appear.
 - **Manage Tiling Lists** adds applications to the exclude list (never tiled) or the include list (when non-empty, only these are tiled). Exclude wins over include. Applications are matched by bundle ID.
 
 ## Layouts
 
-Grid, columns, rows, main and stack, spiral. Each window goes to the layout slot nearest where it already is, chosen so the total distance moved is minimal, so windows keep roughly their current arrangement. Fullscreen windows are skipped. Windows slide into position over the move duration and change size over the resize duration, each eased independently and each instant at 0; the animation lasts as long as the longer of the two. Frames are paced by the clock, so a slow window API drops frames rather than stretching the animation. Layout, gap, move duration and resize duration are extension preferences.
+Grid, columns, rows, main and stack, spiral, and two cascades, stack horizontal and stack vertical. A cascade gives every window the same size and offsets each one along a single axis by the stack offset, so a strip of each earlier window shows behind the next; the offset shrinks so windows never fall below half the screen along that axis. Cascade windows overlap, and Raycast cannot change window stacking order, so which strip is visible depends on the order the windows are already stacked in. Each window goes to the layout slot nearest where it already is, chosen so the total distance moved is minimal, so windows keep roughly their current arrangement. Fullscreen windows are skipped. Windows slide into position over the move duration and change size over the resize duration, each eased independently and each instant at 0; the animation lasts as long as the longer of the two. Frames are paced by the clock, so a slow window API drops frames rather than stretching the animation. Layout, gap, stack offset, move duration and resize duration are extension preferences.
 
 ## Requirements
 
