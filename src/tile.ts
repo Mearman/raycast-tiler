@@ -7,6 +7,7 @@ import {
 import { showFailureToast } from "@raycast/utils";
 import { animateMoves } from "./animation";
 import { isAllowed } from "./filter";
+import { emptyCellWeightFor, isGridBalance } from "./grid-balance";
 import { isGapUnit } from "./layouts/gap";
 import { isLayoutId, type LayoutId, type Rect } from "./layouts/types";
 import { layoutWindows } from "./layouts/layout-windows";
@@ -102,6 +103,8 @@ async function tileWindows(request: Readonly<TileRequest>): Promise<void> {
     gapUnit,
     gapAtEdge,
     gapBetween,
+    gridBalance,
+    gridEmptyCellPenalty: rawCustomPenalty,
     moveDuration: rawMoveDuration,
     resizeDuration: rawResizeDuration,
   } = getPreferenceValues<Preferences>();
@@ -113,6 +116,14 @@ async function tileWindows(request: Readonly<TileRequest>): Promise<void> {
     throw new Error(`Unknown window order "${String(order)}"`);
   if (!isGapUnit(gapUnit))
     throw new Error(`Unknown gap unit "${String(gapUnit)}"`);
+  if (!isGridBalance(gridBalance))
+    throw new Error(`Unknown grid balance "${String(gridBalance)}"`);
+  const emptyCellWeight = emptyCellWeightFor(
+    gridBalance,
+    gridBalance === "custom"
+      ? parseNonNegative("Grid empty cell penalty", rawCustomPenalty)
+      : 0,
+  );
   const gap = {
     value: parseNumber("Gap", rawGap),
     unit: gapUnit,
@@ -159,7 +170,10 @@ async function tileWindows(request: Readonly<TileRequest>): Promise<void> {
       width: desktop.size.width,
       height: desktop.size.height,
     };
-    const rects = layoutWindows(layout, windows.length, area, gap);
+    const rects = layoutWindows(layout, windows.length, area, {
+      gap,
+      options: { emptyCellWeight },
+    });
     const ordered = orderBySlot({
       order,
       items: windows,

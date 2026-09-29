@@ -2,6 +2,10 @@ import { describe, expect, it } from "vitest";
 import { neighbourInDirection } from "./direction";
 import { layoutWindows } from "./layouts/layout-windows";
 import type { Rect } from "./layouts/types";
+import type { LayoutOptions } from "./layouts/types";
+
+/** A zero weight keeps the expectations below independent of how the grid penalises empty cells. */
+const LAYOUT_OPTIONS: LayoutOptions = { emptyCellWeight: 0 };
 
 const AREA: Rect = { x: 0, y: 0, width: 900, height: 900 };
 const GRID_CELL_COUNT = 9;
@@ -16,7 +20,10 @@ const NO_GAP = { value: 0, unit: "points", edge: true, between: true } as const;
 
 describe("neighbourInDirection", () => {
   // Slot order of a 3x3 grid: 0 1 2 / 3 4 5 / 6 7 8.
-  const grid = layoutWindows("grid", GRID_CELL_COUNT, AREA, NO_GAP);
+  const grid = layoutWindows("grid", GRID_CELL_COUNT, AREA, {
+    gap: NO_GAP,
+    options: LAYOUT_OPTIONS,
+  });
 
   it("finds the adjacent cell in each direction", () => {
     expect(neighbourInDirection(grid, GRID_CENTRE, "left")).toBe(
@@ -48,12 +55,10 @@ describe("neighbourInDirection", () => {
   });
 
   it("chooses the better aligned cell when two are equally near", () => {
-    const stack = layoutWindows(
-      "main-stack",
-      MAIN_STACK_WINDOW_COUNT,
-      AREA,
-      NO_GAP,
-    );
+    const stack = layoutWindows("main-stack", MAIN_STACK_WINDOW_COUNT, AREA, {
+      gap: NO_GAP,
+      options: LAYOUT_OPTIONS,
+    });
     // The main window's centre is level with the boundary between the two stacked windows.
     expect(neighbourInDirection(stack, 0, "right")).toBe(1);
     expect(neighbourInDirection(stack, 1, "left")).toBe(0);
@@ -62,7 +67,10 @@ describe("neighbourInDirection", () => {
   });
 
   it("finds nothing across a single window", () => {
-    const single = layoutWindows("grid", 1, AREA, NO_GAP);
+    const single = layoutWindows("grid", 1, AREA, {
+      gap: NO_GAP,
+      options: LAYOUT_OPTIONS,
+    });
     expect(neighbourInDirection(single, 0, "left")).toBeUndefined();
   });
 });

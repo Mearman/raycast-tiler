@@ -3,6 +3,10 @@ import { LAYOUT_IDS } from "./types";
 import { layoutWindows } from "./layout-windows";
 import type { Gap } from "./gap";
 import type { Rect } from "./types";
+import type { LayoutOptions } from "./types";
+
+/** A zero weight keeps the expectations below independent of how the grid penalises empty cells. */
+const LAYOUT_OPTIONS: LayoutOptions = { emptyCellWeight: 0 };
 
 const NO_GAP: Gap = { value: 0, unit: "points", edge: true, between: true };
 
@@ -52,14 +56,19 @@ function overlaps(a: Readonly<Rect>, b: Readonly<Rect>): boolean {
 
 describe.each(LAYOUT_IDS)("%s layout", (id) => {
   it("returns no rectangles for no windows", () => {
-    expect(layoutWindows(id, 0, SCREEN, NO_GAP)).toEqual([]);
+    expect(
+      layoutWindows(id, 0, SCREEN, { gap: NO_GAP, options: LAYOUT_OPTIONS }),
+    ).toEqual([]);
   });
 
   it.each(AREAS)(
     "tiles $width x $height exactly for every window count",
     (area) => {
       for (const count of COUNTS) {
-        const rects = layoutWindows(id, count, area, NO_GAP);
+        const rects = layoutWindows(id, count, area, {
+          gap: NO_GAP,
+          options: LAYOUT_OPTIONS,
+        });
         expect(rects).toHaveLength(count);
         const covered = rects.reduce(
           (total, rect) => total + rect.width * rect.height,
@@ -88,10 +97,13 @@ describe.each(LAYOUT_IDS)("%s layout", (id) => {
   it("leaves the requested gap around the edge and between windows", () => {
     const gap = 10;
     const rects = layoutWindows(id, FOUR_WINDOWS, SCREEN, {
-      value: gap,
-      unit: "points",
-      edge: true,
-      between: true,
+      gap: {
+        value: gap,
+        unit: "points",
+        edge: true,
+        between: true,
+      },
+      options: LAYOUT_OPTIONS,
     });
     expect(Math.min(...rects.map((rect) => rect.x))).toBe(SCREEN.x + gap);
     expect(Math.min(...rects.map((rect) => rect.y))).toBe(SCREEN.y + gap);
@@ -113,7 +125,12 @@ describe("layout shapes", () => {
   const area: Rect = { x: 0, y: 0, width: 1000, height: 800 };
 
   it("places four windows in a 2x2 grid", () => {
-    expect(layoutWindows("grid", FOUR_WINDOWS, area, NO_GAP)).toEqual([
+    expect(
+      layoutWindows("grid", FOUR_WINDOWS, area, {
+        gap: NO_GAP,
+        options: LAYOUT_OPTIONS,
+      }),
+    ).toEqual([
       { x: 0, y: 0, width: 500, height: 400 },
       { x: 500, y: 0, width: 500, height: 400 },
       { x: 0, y: 400, width: 500, height: 400 },
@@ -122,19 +139,28 @@ describe("layout shapes", () => {
   });
 
   it("places nine windows in a 3x3 grid on a widescreen area", () => {
-    const rects = layoutWindows("grid", NINE_WINDOWS, WIDESCREEN, NO_GAP);
+    const rects = layoutWindows("grid", NINE_WINDOWS, WIDESCREEN, {
+      gap: NO_GAP,
+      options: LAYOUT_OPTIONS,
+    });
     expect(new Set(rects.map((rect) => rect.x)).size).toBe(THREE_TRACKS);
     expect(new Set(rects.map((rect) => rect.y)).size).toBe(THREE_TRACKS);
   });
 
   it("places seven windows in two rows of four and three", () => {
-    const rects = layoutWindows("grid", SEVEN_WINDOWS, WIDESCREEN, NO_GAP);
+    const rects = layoutWindows("grid", SEVEN_WINDOWS, WIDESCREEN, {
+      gap: NO_GAP,
+      options: LAYOUT_OPTIONS,
+    });
     expect(rects.filter((rect) => rect.y === 0)).toHaveLength(FOUR_IN_ROW);
     expect(rects.filter((rect) => rect.y !== 0)).toHaveLength(THREE_WINDOWS);
   });
 
   it("stretches a short final grid row across the full width", () => {
-    const rects = layoutWindows("grid", FIVE_WINDOWS, area, NO_GAP);
+    const rects = layoutWindows("grid", FIVE_WINDOWS, area, {
+      gap: NO_GAP,
+      options: LAYOUT_OPTIONS,
+    });
     const lastRow = rects.filter((rect) => rect.y !== 0);
     expect(lastRow).toEqual([
       { x: 0, y: 400, width: 500, height: 400 },
@@ -143,7 +169,12 @@ describe("layout shapes", () => {
   });
 
   it("gives the first window the left half in main-stack", () => {
-    expect(layoutWindows("main-stack", THREE_WINDOWS, area, NO_GAP)).toEqual([
+    expect(
+      layoutWindows("main-stack", THREE_WINDOWS, area, {
+        gap: NO_GAP,
+        options: LAYOUT_OPTIONS,
+      }),
+    ).toEqual([
       { x: 0, y: 0, width: 500, height: 800 },
       { x: 500, y: 0, width: 500, height: 400 },
       { x: 500, y: 400, width: 500, height: 400 },
@@ -151,7 +182,12 @@ describe("layout shapes", () => {
   });
 
   it("spirals clockwise: left, top, right, bottom", () => {
-    expect(layoutWindows("spiral", FIVE_WINDOWS, area, NO_GAP)).toEqual([
+    expect(
+      layoutWindows("spiral", FIVE_WINDOWS, area, {
+        gap: NO_GAP,
+        options: LAYOUT_OPTIONS,
+      }),
+    ).toEqual([
       { x: 0, y: 0, width: 500, height: 800 },
       { x: 500, y: 0, width: 500, height: 400 },
       { x: 750, y: 400, width: 250, height: 400 },

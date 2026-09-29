@@ -8,6 +8,10 @@ import {
   swapActive,
   swapInDirection,
 } from "./reorder";
+import type { LayoutOptions } from "./layouts/types";
+
+/** A zero weight keeps the expectations below independent of how the grid penalises empty cells. */
+const LAYOUT_OPTIONS: LayoutOptions = { emptyCellWeight: 0 };
 
 describe("swapActive", () => {
   const isB = (item: string) => item === "b";
@@ -107,7 +111,10 @@ describe("swapInDirection", () => {
     "grid",
     GRID_WINDOW_COUNT,
     { x: 0, y: 0, width: 200, height: 200 },
-    { value: 0, unit: "points", edge: true, between: true },
+    {
+      gap: { value: 0, unit: "points", edge: true, between: true },
+      options: LAYOUT_OPTIONS,
+    },
   );
   const items = ["a", "b", "c", "d"];
   const isC = (item: string) => item === "c";

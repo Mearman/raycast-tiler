@@ -483,6 +483,37 @@
       ]
     },
     {
+      "name": "gridBalance",
+      "title": "Grid Balance",
+      "description": "How the Grid layout picks its columns. Even Rows prefers full rows over cells that match the screen's shape (eight windows become two rows of four). Screen Shape follows the screen's shape alone (eight windows become rows of 3, 3 and 2). Custom uses the penalty below.",
+      "type": "dropdown",
+      "required": false,
+      "default": "even-rows",
+      "data": [
+        {
+          "title": "Even Rows",
+          "value": "even-rows"
+        },
+        {
+          "title": "Screen Shape",
+          "value": "screen-shape"
+        },
+        {
+          "title": "Custom",
+          "value": "custom"
+        }
+      ]
+    },
+    {
+      "name": "gridEmptyCellPenalty",
+      "title": "Grid Empty Cell Penalty",
+      "description": "Used when Grid Balance is Custom. How strongly the Grid layout avoids empty cells in a short last row, relative to matching the screen's shape. 0 ignores empty cells; larger values prefer full rows. Must be a non-negative number.",
+      "type": "textfield",
+      "required": false,
+      "default": "4",
+      "placeholder": "4"
+    },
+    {
       "name": "windowOrder",
       "title": "Window Order",
       "description": "Which window goes in which layout slot. Nearest keeps windows close to where they are; Reading Order goes top to bottom then left to right; Active First puts the focused window in the first slot (the main slot in Main + Stack); App Priority follows the order of the include list.",

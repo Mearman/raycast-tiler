@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { GRID_BALANCES } from "./grid-balance";
 import { GAP_UNITS } from "./layouts/gap";
 import { LAYOUT_IDS } from "./layouts/types";
 import { ORDER_IDS } from "./ordering";
@@ -47,6 +48,21 @@ describe("manifest", () => {
     expect(layout?.data?.map((option) => option.value)).toEqual([
       ...LAYOUT_IDS,
     ]);
+  });
+
+  it("offers every grid balance in the grid balance preference", () => {
+    const balance = parsed.preferences.find(
+      (pref) => pref.name === "gridBalance",
+    );
+    expect(balance?.data?.map((option) => option.value)).toEqual([
+      ...GRID_BALANCES,
+    ]);
+  });
+
+  it("has a custom grid penalty preference for the custom balance", () => {
+    expect(
+      parsed.preferences.some((pref) => pref.name === "gridEmptyCellPenalty"),
+    ).toBe(true);
   });
 
   it("offers every gap unit in the gap unit preference", () => {

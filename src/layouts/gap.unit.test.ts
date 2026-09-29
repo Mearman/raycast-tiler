@@ -2,6 +2,10 @@ import { describe, expect, it } from "vitest";
 import { applyGap, type Gap } from "./gap";
 import { layoutWindows } from "./layout-windows";
 import type { Rect } from "./types";
+import type { LayoutOptions } from "./types";
+
+/** A zero weight keeps the expectations below independent of how the grid penalises empty cells. */
+const LAYOUT_OPTIONS: LayoutOptions = { emptyCellWeight: 0 };
 
 const AREA_WIDTH = 1000;
 const AREA_HEIGHT = 800;
@@ -111,14 +115,22 @@ describe("applyGap", () => {
 
 describe("layoutWindows gaps", () => {
   it("returns the slots untouched for a zero gap", () => {
-    expect(layoutWindows("columns", 2, AREA, points(0))).toEqual([
+    expect(
+      layoutWindows("columns", 2, AREA, {
+        gap: points(0),
+        options: LAYOUT_OPTIONS,
+      }),
+    ).toEqual([
       { x: 0, y: 0, width: 500, height: 800 },
       { x: 500, y: 0, width: 500, height: 800 },
     ]);
   });
 
   it("overlaps neighbouring windows for a negative gap", () => {
-    const [a, b] = layoutWindows("columns", 2, AREA, points(-OVERLAP_GAP));
+    const [a, b] = layoutWindows("columns", 2, AREA, {
+      gap: points(-OVERLAP_GAP),
+      options: LAYOUT_OPTIONS,
+    });
     expect(a === undefined || b === undefined).toBe(false);
     if (a === undefined || b === undefined) return;
     expect(a.x + a.width - b.x).toBe(OVERLAP_GAP);
@@ -126,12 +138,18 @@ describe("layoutWindows gaps", () => {
 
   it("throws when the gap leaves no room for a window", () => {
     expect(() =>
-      layoutWindows("columns", CROWDED_COLUMNS, AREA, points(TOO_LARGE_GAP)),
+      layoutWindows("columns", CROWDED_COLUMNS, AREA, {
+        gap: points(TOO_LARGE_GAP),
+        options: LAYOUT_OPTIONS,
+      }),
     ).toThrow("no room");
     expect(() =>
       layoutWindows("columns", 2, AREA, {
-        ...points(TOO_LARGE_SCREEN_PERCENT),
-        unit: "screen",
+        gap: {
+          ...points(TOO_LARGE_SCREEN_PERCENT),
+          unit: "screen",
+        },
+        options: LAYOUT_OPTIONS,
       }),
     ).toThrow("no room");
   });
