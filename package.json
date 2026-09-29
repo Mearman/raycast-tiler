@@ -582,13 +582,15 @@
   "scripts": {
     "build": "ray build",
     "dev": "ray develop",
-    "lint": "ray lint",
-    "mutation": "stryker run stryker.config.ts",
+    "generate-types": "ray build",
+    "lint": "pnpm run generate-types && eslint . --max-warnings 0",
+    "lint:raycast": "ray lint",
+    "mutation": "pnpm run generate-types && stryker run stryker.config.ts",
     "prepare": "git config --get core.hooksPath > /dev/null || husky",
     "release": "semantic-release",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "typecheck": "ray build && tsc --noEmit"
+    "typecheck": "pnpm run generate-types && tsc --noEmit"
   },
   "title": "Window Tiler",
   "type": "module"

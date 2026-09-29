@@ -35,9 +35,11 @@ pnpm dev
 - `pnpm build` runs `ray build`.
 - `pnpm test` runs the whole Vitest suite. Run one file with `pnpm exec vitest run src/proximity.unit.test.ts`. Run one test with `-t "part of the test name"`.
 - `pnpm test:coverage` runs the suite with V8 coverage.
-- `pnpm lint` runs `ray lint`: manifest checks, ESLint and Prettier. Fix formatting with `pnpm exec ray lint --fix`. Run ESLint alone with `pnpm exec eslint . --max-warnings 0`.
-- `pnpm typecheck` runs `ray build` first, then `tsc --noEmit`. The build generates `raycast-env.d.ts`, which types the preferences and command arguments. Git ignores that file.
-- `pnpm mutation` runs Stryker on the pure logic modules with the Vitest runner and the TypeScript checker. It reads `stryker.config.ts`.
+- `pnpm lint` generates the types, then runs ESLint with no warnings allowed. ESLint includes Prettier and the Raycast rules. Fix formatting and auto-fixable problems with `pnpm exec eslint . --fix`.
+- `pnpm lint:raycast` runs `ray lint`, which adds the manifest and icon checks. In CI it also demands a `package-lock.json`, which the Raycast store needs and this pnpm project does not have, so CI does not run it.
+- `pnpm typecheck` generates the types, then runs `tsc --noEmit`.
+- `pnpm generate-types` runs `ray build`, which writes `raycast-env.d.ts`. That file types the preferences and command arguments, and git ignores it. Run this script once after a clone, because lint-staged and editors need the file. `pnpm lint`, `pnpm typecheck` and `pnpm mutation` run it themselves.
+- `pnpm mutation` generates the types, then runs Stryker on the pure logic modules with the Vitest runner and the TypeScript checker. It reads `stryker.config.ts`.
 
 ## Architecture
 
