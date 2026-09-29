@@ -90,7 +90,7 @@ describe("animateMoves", () => {
 
         return Promise.resolve();
       },
-      { moveMs: DURATION_MS, resizeMs: DURATION_MS },
+      { moveMs: DURATION_MS, resizeMs: DURATION_MS, sequential: false },
       steppingClock(CLOCK_STEP_MS),
     );
     expect(failures.size).toBe(0);
@@ -109,7 +109,7 @@ describe("animateMoves", () => {
 
         return Promise.resolve();
       },
-      { moveMs: 0, resizeMs: 0 },
+      { moveMs: 0, resizeMs: 0, sequential: false },
       steppingClock(CLOCK_STEP_MS),
     );
     expect(frames).toEqual([TO]);
@@ -124,7 +124,7 @@ describe("animateMoves", () => {
 
         return Promise.resolve();
       },
-      { moveMs: DURATION_MS, resizeMs: 0 },
+      { moveMs: DURATION_MS, resizeMs: 0, sequential: false },
       steppingClock(CLOCK_STEP_MS),
     );
     expect(frames.length).toBeGreaterThan(2);
@@ -147,7 +147,7 @@ describe("animateMoves", () => {
 
         return Promise.resolve();
       },
-      { moveMs: 0, resizeMs: DURATION_MS },
+      { moveMs: 0, resizeMs: DURATION_MS, sequential: false },
       steppingClock(CLOCK_STEP_MS),
     );
     expect(frames.length).toBeGreaterThan(2);
@@ -171,7 +171,7 @@ describe("animateMoves", () => {
 
         return Promise.resolve();
       },
-      { moveMs: CLOCK_STEP_MS, resizeMs: LONG_RESIZE_MS },
+      { moveMs: CLOCK_STEP_MS, resizeMs: LONG_RESIZE_MS, sequential: false },
       steppingClock(CLOCK_STEP_MS),
     );
     expect(frames).toHaveLength(LONG_RESIZE_MS / CLOCK_STEP_MS);
@@ -191,11 +191,103 @@ describe("animateMoves", () => {
 
         return Promise.resolve();
       },
-      { moveMs: DURATION_MS, resizeMs: DURATION_MS },
+      { moveMs: DURATION_MS, resizeMs: DURATION_MS, sequential: false },
       steppingClock(CLOCK_STEP_MS),
     );
     expect([...failures.keys()]).toEqual(["bad"]);
     expect(calls.filter((call) => call === "bad")).toHaveLength(1);
     expect(calls.filter((call) => call === "good").length).toBeGreaterThan(1);
+  });
+});
+
+describe("animateMoves in sequence", () => {
+  function steppingClock(step: number): () => number {
+    let time = 0;
+
+    return () => {
+      const current = time;
+      time += step;
+
+      return current;
+    };
+  }
+
+  const TIMING = {
+    moveMs: DURATION_MS,
+    resizeMs: DURATION_MS,
+    sequential: true,
+  };
+
+  const moves: Move<string>[] = [
+    { subject: "a", from: FROM, to: TO },
+    { subject: "b", from: FROM, to: TO },
+    { subject: "c", from: FROM, to: TO },
+  ];
+
+  async function record(
+    moveList: readonly Move<string>[],
+    timing: typeof TIMING,
+  ): Promise<{ subject: string; rect: Rect }[]> {
+    const calls: { subject: string; rect: Rect }[] = [];
+    await animateMoves(
+      moveList,
+      async (subject, rect) => {
+        calls.push({ subject, rect });
+
+        return Promise.resolve();
+      },
+      timing,
+      steppingClock(CLOCK_STEP_MS),
+    );
+
+    return calls;
+  }
+
+  it("finishes each subject before the next starts, in the order given", async () => {
+    const subjects = (await record(moves, TIMING)).map((call) => call.subject);
+    expect(subjects).toEqual([...subjects].sort());
+    expect(new Set(subjects).size).toBe(moves.length);
+  });
+
+  it("ends every subject on its exact target", async () => {
+    const calls = await record(moves, TIMING);
+    for (const { subject } of moves) {
+      const last = calls.filter((call) => call.subject === subject).at(-1);
+      expect(last?.rect).toEqual(TO);
+    }
+  });
+
+  it("interleaves the subjects when not sequential", async () => {
+    const subjects = (
+      await record(moves, { ...TIMING, sequential: false })
+    ).map((call) => call.subject);
+    expect(subjects).not.toEqual([...subjects].sort());
+  });
+
+  it("carries on with the next subject after one fails", async () => {
+    const seen: string[] = [];
+    const failures = await animateMoves(
+      moves,
+      async (subject) => {
+        seen.push(subject);
+
+        return subject === "a"
+          ? Promise.reject(new Error("cannot move"))
+          : Promise.resolve();
+      },
+      TIMING,
+      steppingClock(CLOCK_STEP_MS),
+    );
+    expect([...failures.keys()]).toEqual(["a"]);
+    expect(seen.filter((subject) => subject === "a")).toHaveLength(1);
+    expect(seen).toContain("b");
+    expect(seen).toContain("c");
+  });
+
+  it("still keeps the order when the durations are zero", async () => {
+    const subjects = (
+      await record(moves, { ...TIMING, moveMs: 0, resizeMs: 0 })
+    ).map((call) => call.subject);
+    expect(subjects).toEqual(["a", "b", "c"]);
   });
 });

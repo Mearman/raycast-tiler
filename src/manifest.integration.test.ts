@@ -65,6 +65,13 @@ describe("manifest", () => {
     ).toBe(true);
   });
 
+  it("has a preference for sequential transitions", () => {
+    const sequence = parsed.preferences.find(
+      (pref) => pref.name === "sequentialTransitions",
+    );
+    expect(sequence).toBeDefined();
+  });
+
   it("offers every gap unit in the gap unit preference", () => {
     const unit = parsed.preferences.find((pref) => pref.name === "gapUnit");
     expect(unit?.data?.map((option) => option.value)).toEqual([...GAP_UNITS]);

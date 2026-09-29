@@ -104,6 +104,7 @@ async function tileWindows(request: Readonly<TileRequest>): Promise<void> {
     gapAtEdge,
     gapBetween,
     gridBalance,
+    sequentialTransitions,
     gridEmptyCellPenalty: rawCustomPenalty,
     moveDuration: rawMoveDuration,
     resizeDuration: rawResizeDuration,
@@ -130,8 +131,9 @@ async function tileWindows(request: Readonly<TileRequest>): Promise<void> {
     edge: gapAtEdge,
     between: gapBetween,
   };
-  const durations = {
+  const timing = {
     moveMs: parseNonNegative("Move duration", rawMoveDuration),
+    sequential: sequentialTransitions,
     resizeMs: parseNonNegative("Resize duration", rawResizeDuration),
   };
 
@@ -226,7 +228,7 @@ async function tileWindows(request: Readonly<TileRequest>): Promise<void> {
           size: { width: rect.width, height: rect.height },
         },
       }),
-    durations,
+    timing,
   );
 
   const tiled = moves.length - failures.size;

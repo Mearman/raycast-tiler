@@ -13,12 +13,12 @@ Raycast extension that tiles macOS windows into a layout, with include and exclu
 
 Reorder commands use the layout and scope of the last tiling command. They match windows to slots by current position, whatever the Window Order preference says.
 
-Extension preferences: Layout (grid, columns, rows, main and stack, spiral), Grid Balance, Grid Empty Cell Penalty, Window Order, Gap, Gap Unit, two Gap Placement checkboxes, Move Duration and Resize Duration.
+Extension preferences: Layout (grid, columns, rows, main and stack, spiral), Grid Balance, Grid Empty Cell Penalty, Window Order, Gap, Gap Unit, two Gap Placement checkboxes, Move Duration, Resize Duration and Transition Order.
 
 - **Grid Balance** decides how the grid layout picks its columns. Every layout is scored by how far its cells are from the screen's shape plus a weighted share of empty cells. **Even Rows** (default) uses a high weight, so eight windows tile as two rows of four and ten as two rows of five. **Screen Shape** uses no weight, so eight windows tile as rows of 3, 3 and 2. **Custom** uses the **Grid Empty Cell Penalty** number: 0 ignores empty cells and larger values prefer full rows. When two layouts score the same, the grid follows the screen's orientation, so two windows sit side by side on a wide screen.
 - **Window Order** decides which window goes in which slot. Nearest slot (default) minimises total movement. Reading order goes top to bottom, then left to right. Active first puts the focused window in the first slot. App priority follows the include list, with ties in reading order.
 - **Gap** is the space between windows and around the screen edge. Gap Unit selects points, percent of each window, or percent of the screen. Percentages apply per axis. The two checkboxes select the screen edge, the space between windows, or both. A negative gap makes neighbouring windows overlap. It never pushes a window past the screen edge. A gap that leaves a window with no width or height is an error.
-- **Move Duration** and **Resize Duration** are in milliseconds. Windows slide and resize into place, each part eased on its own. A value of 0 makes that part instant.
+- **Move Duration** and **Resize Duration** are in milliseconds. Windows slide and resize into place, each part eased on its own. A value of 0 makes that part instant. **Transition Order** is a checkbox. When it is on, each window finishes moving and resizing before the next one starts, in layout order, so the whole transition takes as long as all windows added up. When it is off, all windows move together.
 
 ## Getting started
 
