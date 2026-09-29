@@ -1,3 +1,26 @@
+import { neighbourInDirection, type Direction } from "./direction";
+import type { Rect } from "./layouts";
+
+export const REORDER_ACTIONS = [
+  "left",
+  "right",
+  "up",
+  "down",
+  "forward",
+  "back",
+  "start",
+  "end",
+  "rotate-forward",
+  "rotate-back",
+] as const;
+
+/** A change to the order or position of windows within the current layout. */
+export type ReorderAction = (typeof REORDER_ACTIONS)[number];
+
+export function isReorderAction(value: unknown): value is ReorderAction {
+  return REORDER_ACTIONS.some((action) => action === value);
+}
+
 function wrap(index: number, length: number): number {
   return ((index % length) + length) % length;
 }
@@ -48,4 +71,29 @@ export function moveActiveTo<T>(
   if (active === undefined) return undefined;
   const others = items.filter((item) => item !== active);
   return edge === "start" ? [active, ...others] : [...others, active];
+}
+
+/**
+ * Swaps the active item with the item in the neighbouring slot in `direction`.
+ *
+ * `items[k]` occupies `slots[k]`. Returns a new array, or `undefined` when no item is active. Throws when the active item's slot has no neighbour that way.
+ */
+export function swapInDirection<T>(
+  items: readonly T[],
+  slots: readonly Rect[],
+  isActive: (item: T) => boolean,
+  direction: Direction,
+): T[] | undefined {
+  const from = items.findIndex(isActive);
+  if (from === -1) return undefined;
+  const to = neighbourInDirection(slots, from, direction);
+  if (to === undefined) throw new Error(`No window to the ${direction}`);
+  const result = [...items];
+  const active = result[from];
+  const displaced = result[to];
+  if (displaced === undefined || active === undefined)
+    throw new Error("Index is outside the items");
+  result[to] = active;
+  result[from] = displaced;
+  return result;
 }

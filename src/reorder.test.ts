@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { moveActiveTo, rotate, swapActive } from "./reorder";
+import { layoutWindows } from "./layouts";
+import {
+  isReorderAction,
+  moveActiveTo,
+  REORDER_ACTIONS,
+  rotate,
+  swapActive,
+  swapInDirection,
+} from "./reorder";
 
 describe("swapActive", () => {
   const isB = (item: string) => item === "b";
@@ -87,5 +95,49 @@ describe("moveActiveTo", () => {
 
   it("returns undefined when nothing is active", () => {
     expect(moveActiveTo(["a", "b"], () => false, "start")).toBeUndefined();
+  });
+});
+
+describe("swapInDirection", () => {
+  const slots = layoutWindows(
+    "grid",
+    4,
+    { x: 0, y: 0, width: 200, height: 200 },
+    { value: 0, unit: "points", edge: true, between: true },
+  );
+  const items = ["a", "b", "c", "d"];
+  const isC = (item: string) => item === "c";
+
+  it("swaps the active item with its neighbour in that direction", () => {
+    expect(swapInDirection(items, slots, isC, "right")).toEqual([
+      "a",
+      "b",
+      "d",
+      "c",
+    ]);
+    expect(swapInDirection(items, slots, isC, "up")).toEqual([
+      "c",
+      "b",
+      "a",
+      "d",
+    ]);
+  });
+
+  it("returns undefined when nothing is active", () => {
+    expect(swapInDirection(items, slots, () => false, "left")).toBeUndefined();
+  });
+
+  it("throws when there is no neighbour that way", () => {
+    expect(() => swapInDirection(items, slots, isC, "left")).toThrow(
+      "No window to the left",
+    );
+  });
+});
+
+describe("isReorderAction", () => {
+  it("accepts every action and nothing else", () => {
+    for (const action of REORDER_ACTIONS)
+      expect(isReorderAction(action)).toBe(true);
+    expect(isReorderAction("sideways")).toBe(false);
   });
 });
