@@ -4,9 +4,9 @@ Raycast extension that tiles windows into a chosen layout, with include and excl
 
 ## Commands
 
-- **Tile All** tiles every window on the active desktop in the layout chosen in preferences.
+- **Tile Windows** tiles every window on the active desktop in the layout chosen in preferences.
 - **Tile App** tiles every window of the frontmost application in the layout chosen in preferences.
-- **Tile All: Layout** and **Tile App: Layout**, one pair per layout, ignore the layout preference and always use their own layout.
+- **Tile Windows: Layout** and **Tile App: Layout**, one pair per layout, ignore the layout preference and always use their own layout.
 - **Tiling Lists** adds applications to the exclude list (never tiled) or the include list (when non-empty, only these are tiled). Exclude wins over include. Applications are matched by bundle ID.
 
 ## Layouts

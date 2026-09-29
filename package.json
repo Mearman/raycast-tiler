@@ -28,7 +28,7 @@
     },
     {
       "name": "tile-desktop",
-      "title": "Tile All",
+      "title": "Tile Windows",
       "description": "Tile every window on the active desktop in the layout chosen in preferences.",
       "mode": "no-view",
       "keywords": [
@@ -46,7 +46,7 @@
     },
     {
       "name": "tile-desktop-grid",
-      "title": "Tile All: Grid",
+      "title": "Tile Windows: Grid",
       "description": "Tile every window on the active desktop as Grid, whatever the layout preference says.",
       "mode": "no-view",
       "keywords": [
@@ -58,7 +58,7 @@
     },
     {
       "name": "tile-desktop-columns",
-      "title": "Tile All: Columns",
+      "title": "Tile Windows: Columns",
       "description": "Tile every window on the active desktop as Columns, whatever the layout preference says.",
       "mode": "no-view",
       "keywords": [
@@ -70,7 +70,7 @@
     },
     {
       "name": "tile-desktop-rows",
-      "title": "Tile All: Rows",
+      "title": "Tile Windows: Rows",
       "description": "Tile every window on the active desktop as Rows, whatever the layout preference says.",
       "mode": "no-view",
       "keywords": [
@@ -82,7 +82,7 @@
     },
     {
       "name": "tile-desktop-main-stack",
-      "title": "Tile All: Main + Stack",
+      "title": "Tile Windows: Main + Stack",
       "description": "Tile every window on the active desktop as Main and Stack, whatever the layout preference says.",
       "mode": "no-view",
       "keywords": [
@@ -94,7 +94,7 @@
     },
     {
       "name": "tile-desktop-spiral",
-      "title": "Tile All: Spiral",
+      "title": "Tile Windows: Spiral",
       "description": "Tile every window on the active desktop as Spiral, whatever the layout preference says.",
       "mode": "no-view",
       "keywords": [
