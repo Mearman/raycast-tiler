@@ -6,17 +6,27 @@ import {
   progressAt,
   type Move,
 } from "./animation";
-import type { Rect } from "./layouts";
+import type { Rect } from "./layouts/types";
 
 const FROM: Rect = { x: 0, y: 0, width: 100, height: 100 };
 const TO: Rect = { x: 200, y: 100, width: 300, height: 50 };
+// Number of equal intervals sampled across the easing curve.
+const EASE_INTERVALS = 20;
+const DURATION_MS = 200;
+const HALF_DURATION_MS = 100;
+const BEFORE_START_MS = -50;
+const AFTER_END_MS = 900;
+const LONG_RESIZE_MS = 400;
+const HALF_PROGRESS = 0.5;
+// Time advanced by the fake clock on every read.
+const CLOCK_STEP_MS = 50;
 
 describe("easeOutCubic", () => {
   it("runs from 0 to 1 and never decreases", () => {
     expect(easeOutCubic(0)).toBe(0);
     expect(easeOutCubic(1)).toBe(1);
-    const samples = Array.from({ length: 21 }, (_, index) =>
-      easeOutCubic(index / 20),
+    const samples = Array.from({ length: EASE_INTERVALS + 1 }, (_, index) =>
+      easeOutCubic(index / EASE_INTERVALS),
     );
     samples.slice(1).forEach((value, index) => {
       expect(value).toBeGreaterThanOrEqual(samples[index] ?? Infinity);
@@ -26,9 +36,9 @@ describe("easeOutCubic", () => {
 
 describe("progressAt", () => {
   it("clamps to the range 0 to 1", () => {
-    expect(progressAt(-50, 200)).toBe(0);
-    expect(progressAt(100, 200)).toBe(0.5);
-    expect(progressAt(900, 200)).toBe(1);
+    expect(progressAt(BEFORE_START_MS, DURATION_MS)).toBe(0);
+    expect(progressAt(HALF_DURATION_MS, DURATION_MS)).toBe(HALF_PROGRESS);
+    expect(progressAt(AFTER_END_MS, DURATION_MS)).toBe(1);
   });
 
   it("treats a zero duration as complete", () => {
@@ -61,9 +71,11 @@ describe("interpolateRect", () => {
 describe("animateMoves", () => {
   function steppingClock(step: number): () => number {
     let time = 0;
+
     return () => {
       const current = time;
       time += step;
+
       return current;
     };
   }
@@ -75,9 +87,11 @@ describe("animateMoves", () => {
       moves,
       async (_, rect) => {
         frames.push(rect);
+
+        return Promise.resolve();
       },
-      { moveMs: 200, resizeMs: 200 },
-      steppingClock(50),
+      { moveMs: DURATION_MS, resizeMs: DURATION_MS },
+      steppingClock(CLOCK_STEP_MS),
     );
     expect(failures.size).toBe(0);
     expect(frames.length).toBeGreaterThan(2);
@@ -92,9 +106,11 @@ describe("animateMoves", () => {
       [{ subject: "a", from: FROM, to: TO }],
       async (_, rect) => {
         frames.push(rect);
+
+        return Promise.resolve();
       },
       { moveMs: 0, resizeMs: 0 },
-      steppingClock(50),
+      steppingClock(CLOCK_STEP_MS),
     );
     expect(frames).toEqual([TO]);
   });
@@ -105,9 +121,11 @@ describe("animateMoves", () => {
       [{ subject: "a", from: FROM, to: TO }],
       async (_, rect) => {
         frames.push(rect);
+
+        return Promise.resolve();
       },
-      { moveMs: 200, resizeMs: 0 },
-      steppingClock(50),
+      { moveMs: DURATION_MS, resizeMs: 0 },
+      steppingClock(CLOCK_STEP_MS),
     );
     expect(frames.length).toBeGreaterThan(2);
     for (const frame of frames) {
@@ -126,9 +144,11 @@ describe("animateMoves", () => {
       [{ subject: "a", from: FROM, to: TO }],
       async (_, rect) => {
         frames.push(rect);
+
+        return Promise.resolve();
       },
-      { moveMs: 0, resizeMs: 200 },
-      steppingClock(50),
+      { moveMs: 0, resizeMs: DURATION_MS },
+      steppingClock(CLOCK_STEP_MS),
     );
     expect(frames.length).toBeGreaterThan(2);
     for (const frame of frames) {
@@ -143,17 +163,18 @@ describe("animateMoves", () => {
 
   it("lasts as long as the longer of the two durations", async () => {
     const frames: Rect[] = [];
-    const stepMs = 50;
-    const resizeMs = 400;
+
     await animateMoves(
       [{ subject: "a", from: FROM, to: TO }],
       async (_, rect) => {
         frames.push(rect);
+
+        return Promise.resolve();
       },
-      { moveMs: stepMs, resizeMs },
-      steppingClock(stepMs),
+      { moveMs: CLOCK_STEP_MS, resizeMs: LONG_RESIZE_MS },
+      steppingClock(CLOCK_STEP_MS),
     );
-    expect(frames).toHaveLength(resizeMs / stepMs);
+    expect(frames).toHaveLength(LONG_RESIZE_MS / CLOCK_STEP_MS);
     expect(frames.at(-1)).toEqual(TO);
   });
 
@@ -166,10 +187,12 @@ describe("animateMoves", () => {
       ],
       async (subject) => {
         calls.push(subject);
-        if (subject === "bad") throw new Error("cannot move");
+        if (subject === "bad") return Promise.reject(new Error("cannot move"));
+
+        return Promise.resolve();
       },
-      { moveMs: 200, resizeMs: 200 },
-      steppingClock(50),
+      { moveMs: DURATION_MS, resizeMs: DURATION_MS },
+      steppingClock(CLOCK_STEP_MS),
     );
     expect([...failures.keys()]).toEqual(["bad"]);
     expect(calls.filter((call) => call === "bad")).toHaveLength(1);

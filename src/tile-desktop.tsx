@@ -1,5 +1,5 @@
-import { LaunchProps } from "@raycast/api";
-import { isLayoutId } from "./layouts";
+import { type LaunchProps } from "@raycast/api";
+import { isLayoutId } from "./layouts/types";
 import { runTile } from "./tile";
 
 export default async function Command(

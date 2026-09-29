@@ -1,5 +1,5 @@
 import { assignToNearestSlots } from "./proximity";
-import type { Rect } from "./layouts";
+import type { Rect } from "./layouts/types";
 
 export const ORDER_IDS = [
   "nearest",
@@ -16,14 +16,14 @@ export function isOrderId(value: unknown): value is OrderId {
 }
 
 /** What ordering needs to know about a window. */
-export type WindowFacts<T> = {
+export interface WindowFacts<T> {
   /** The window's current bounds. */
   boundsOf: (item: T) => Rect;
   isActive: (item: T) => boolean;
   bundleIdOf: (item: T) => string | undefined;
-};
+}
 
-function centreOf(rect: Rect): { x: number; y: number } {
+function centreOf(rect: Readonly<Rect>): { x: number; y: number } {
   return { x: rect.x + rect.width / 2, y: rect.y + rect.height / 2 };
 }
 
@@ -56,9 +56,20 @@ export function readingOrder<T>(
       anchor = bounds;
     }
   }
+
   return rows.flatMap((row) =>
     row.sort((a, b) => centreOf(boundsOf(a)).x - centreOf(boundsOf(b)).x),
   );
+}
+
+/** What to order and how; see {@link orderBySlot}. */
+export interface OrderRequest<T> {
+  order: OrderId;
+  items: readonly T[];
+  slots: readonly Rect[];
+  facts: WindowFacts<T>;
+  /** Application bundle IDs, highest priority first; used by `app-priority`. */
+  priority: readonly string[];
 }
 
 /**
@@ -71,27 +82,21 @@ export function readingOrder<T>(
  *
  * Requires as many slots as items.
  */
-export function orderBySlot<T>(
-  order: OrderId,
-  items: readonly T[],
-  slots: readonly Rect[],
-  facts: WindowFacts<T>,
-  priority: readonly string[],
-): T[] {
+export function orderBySlot<T>(request: Readonly<OrderRequest<T>>): T[] {
+  const { items, slots, facts, priority } = request;
   const nearest = (candidates: readonly T[], available: readonly Rect[]) =>
     assignToNearestSlots(
       candidates,
       (item) => centreOf(facts.boundsOf(item)),
       available,
     );
-  switch (order) {
-    case "nearest":
-      return nearest(items, slots);
-    case "reading":
-      return readingOrder(items, facts.boundsOf);
-    case "active-first": {
+  const strategies: Record<OrderId, () => T[]> = {
+    nearest: () => nearest(items, slots),
+    reading: () => readingOrder(items, facts.boundsOf),
+    "active-first": () => {
       const active = items.find(facts.isActive);
       if (active === undefined) return nearest(items, slots);
+
       return [
         active,
         ...nearest(
@@ -99,17 +104,21 @@ export function orderBySlot<T>(
           slots.slice(1),
         ),
       ];
-    }
-    case "app-priority": {
+    },
+    "app-priority": () => {
       const rank = (item: T): number => {
         const bundleId = facts.bundleIdOf(item);
         const position =
           bundleId === undefined ? -1 : priority.indexOf(bundleId);
+
         return position === -1 ? priority.length : position;
       };
+
       return readingOrder(items, facts.boundsOf).sort(
         (a, b) => rank(a) - rank(b),
       );
-    }
-  }
+    },
+  };
+
+  return strategies[request.order]();
 }

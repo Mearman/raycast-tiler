@@ -1,5 +1,8 @@
 import type { Layout, Rect } from "./types";
 
+/** Directions a window can take from the free space, in order: left, top, right, bottom. */
+const SPIRAL_DIRECTIONS = 4;
+
 /**
  * Each window takes half of the space still free, working clockwise: left half, then the top half of what remains, then its right half, then its bottom half, and so on. The last window takes whatever is left.
  */
@@ -13,7 +16,7 @@ export const spiral: Layout = (count, area) => {
     }
     const halfWidth = Math.round(free.width / 2);
     const halfHeight = Math.round(free.height / 2);
-    switch (index % 4) {
+    switch (index % SPIRAL_DIRECTIONS) {
       case 0:
         result.push({ ...free, width: halfWidth });
         free = {
@@ -48,5 +51,6 @@ export const spiral: Layout = (count, area) => {
         break;
     }
   }
+
   return result;
 };

@@ -1,12 +1,17 @@
 /** An axis-aligned rectangle in integer points. */
-export type Rect = { x: number; y: number; width: number; height: number };
+export interface Rect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
 
 /**
  * Computes one rectangle per window inside `area`.
  *
  * Returns exactly `count` rectangles in window order, which tile `area` without overlap. Returns an empty array when `count` is 0.
  */
-export type Layout = (count: number, area: Rect) => Rect[];
+export type Layout = (count: number, area: Readonly<Rect>) => Rect[];
 
 export const LAYOUT_IDS = [
   "grid",

@@ -11,6 +11,7 @@ function worstDistortion(count: number, columnCount: number): number {
   const rowCount = Math.ceil(count / columnCount);
   const lastRowCells = count - (rowCount - 1) * columnCount;
   const distortion = (cells: number) => Math.abs(Math.log(rowCount / cells));
+
   return Math.max(distortion(columnCount), distortion(lastRowCells));
 }
 
@@ -28,9 +29,11 @@ export const grid: Layout = (count, area) => {
       : best,
   );
   const rowCount = Math.ceil(count / columnCount);
+
   return splitSpan(area.y, area.height, rowCount).flatMap((row, rowIndex) => {
     const remaining = count - rowIndex * columnCount;
     const inRow = Math.min(columnCount, remaining);
+
     return columns(inRow, {
       x: area.x,
       y: row.start,

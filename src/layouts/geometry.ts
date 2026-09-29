@@ -11,6 +11,7 @@ export function splitSpan(
   return Array.from({ length: parts }, (_, index) => {
     const from = Math.round((length * index) / parts);
     const to = Math.round((length * (index + 1)) / parts);
+
     return { start: start + from, size: to - from };
   });
 }

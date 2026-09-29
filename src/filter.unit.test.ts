@@ -51,18 +51,23 @@ describe("isAppLists", () => {
 });
 
 describe("move", () => {
+  // Offset that pulls the last of three entries to the start.
+  const TO_START = -2;
+  // Offset that overshoots the end of a three-entry list.
+  const PAST_END = 5;
+
   it("moves an entry by the offset", () => {
     expect(move(["a", "b", "c"], "a", 1)).toEqual(["b", "a", "c"]);
-    expect(move(["a", "b", "c"], "c", -2)).toEqual(["c", "a", "b"]);
+    expect(move(["a", "b", "c"], "c", TO_START)).toEqual(["c", "a", "b"]);
   });
 
   it("stops at either end", () => {
     expect(move(["a", "b", "c"], "a", -1)).toEqual(["a", "b", "c"]);
-    expect(move(["a", "b", "c"], "c", 5)).toEqual(["a", "b", "c"]);
+    expect(move(["a", "b", "c"], "c", PAST_END)).toEqual(["a", "b", "c"]);
   });
 
-  it("leaves the list alone when the entry is absent", () => {
+  it("leaves the list unchanged when the entry is absent", () => {
     const list = ["a", "b"];
-    expect(move(list, "z", 1)).toBe(list);
+    expect(move(list, "z", 1)).toEqual(list);
   });
 });

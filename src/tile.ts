@@ -7,13 +7,9 @@ import {
 import { showFailureToast } from "@raycast/utils";
 import { animateMoves } from "./animation";
 import { isAllowed } from "./filter";
-import {
-  isGapUnit,
-  isLayoutId,
-  layoutWindows,
-  type LayoutId,
-  type Rect,
-} from "./layouts";
+import { isGapUnit } from "./layouts/gap";
+import { isLayoutId, type LayoutId, type Rect } from "./layouts/types";
+import { layoutWindows } from "./layouts/layout-windows";
 import { isOrderId, orderBySlot, type OrderId } from "./ordering";
 import {
   moveActiveTo,
@@ -25,8 +21,6 @@ import {
 import type { Scope } from "./scope";
 import { loadLastTiling, loadLists, saveLastTiling } from "./storage";
 
-export type { Scope } from "./scope";
-
 type Window = WindowManagement.Window;
 
 function parseNumber(name: string, raw: string | undefined): number {
@@ -34,6 +28,7 @@ function parseNumber(name: string, raw: string | undefined): number {
   const value = Number(raw);
   if (!Number.isFinite(value))
     throw new Error(`${name} must be a number, got "${raw}"`);
+
   return value;
 }
 
@@ -42,6 +37,7 @@ function parseNonNegative(name: string, raw: string | undefined): number {
   const value = Number(raw);
   if (!Number.isFinite(value) || value < 0)
     throw new Error(`${name} must be a non-negative number, got "${raw}"`);
+
   return value;
 }
 
@@ -56,6 +52,7 @@ function isPlaced(window: Window): window is PlacedWindow {
 
 function rectOf(window: PlacedWindow): Rect {
   const { position, size } = window.bounds;
+
   return {
     x: position.x,
     y: position.y,
@@ -73,17 +70,18 @@ async function windowsInScope(scope: Scope): Promise<Window[]> {
     throw new Error(
       "The active window does not belong to an identifiable application",
     );
+
   return windows.filter((window) => window.application?.bundleId === bundleId);
 }
 
 /** Rearranges windows already in slot order; `undefined` means this group has nothing to rearrange. */
 type Rearrange = (
-  ordered: PlacedWindow[],
-  slots: Rect[],
+  ordered: readonly PlacedWindow[],
+  slots: readonly Rect[],
   isFocused: (window: PlacedWindow) => boolean,
 ) => PlacedWindow[] | undefined;
 
-type TileRequest = {
+interface TileRequest {
   scope: Scope;
   /** Overrides the layout preference. */
   layout: LayoutId | undefined;
@@ -93,9 +91,9 @@ type TileRequest = {
   rearrange: Rearrange | undefined;
   /** Past-tense verb for the result toast. */
   verb: string;
-};
+}
 
-async function tileWindows(request: TileRequest): Promise<void> {
+async function tileWindows(request: Readonly<TileRequest>): Promise<void> {
   const { scope, rearrange, verb } = request;
   const {
     layout: preferredLayout,
@@ -108,10 +106,13 @@ async function tileWindows(request: TileRequest): Promise<void> {
     resizeDuration: rawResizeDuration,
   } = getPreferenceValues<Preferences>();
   const layout = request.layout ?? preferredLayout;
-  if (!isLayoutId(layout)) throw new Error(`Unknown layout "${layout}"`);
+  if (!isLayoutId(layout))
+    throw new Error(`Unknown layout "${String(layout)}"`);
   const order = request.order ?? windowOrder;
-  if (!isOrderId(order)) throw new Error(`Unknown window order "${order}"`);
-  if (!isGapUnit(gapUnit)) throw new Error(`Unknown gap unit "${gapUnit}"`);
+  if (!isOrderId(order))
+    throw new Error(`Unknown window order "${String(order)}"`);
+  if (!isGapUnit(gapUnit))
+    throw new Error(`Unknown gap unit "${String(gapUnit)}"`);
   const gap = {
     value: parseNumber("Gap", rawGap),
     unit: gapUnit,
@@ -159,24 +160,26 @@ async function tileWindows(request: TileRequest): Promise<void> {
       height: desktop.size.height,
     };
     const rects = layoutWindows(layout, windows.length, area, gap);
-    const ordered = orderBySlot(
+    const ordered = orderBySlot({
       order,
-      windows,
-      rects,
-      {
+      items: windows,
+      slots: rects,
+      facts: {
         boundsOf: rectOf,
         isActive: isFocused,
         bundleIdOf: (window) => window.application?.bundleId,
       },
-      lists.include,
-    );
+      priority: lists.include,
+    });
     const bySlot =
       rearrange === undefined ? ordered : rearrange(ordered, rects, isFocused);
     if (bySlot === undefined) return [];
+
     return bySlot.map((window, index) => {
       const rect = rects[index];
       if (rect === undefined)
         throw new Error("Layout returned fewer rectangles than windows");
+
       return { window, desktopId, rect };
     });
   });
@@ -189,6 +192,7 @@ async function tileWindows(request: TileRequest): Promise<void> {
           ? "No windows to tile"
           : "The focused window is not among the tiled windows",
     });
+
     return;
   }
   if (rearrange === undefined) await saveLastTiling({ scope, layout });
@@ -199,7 +203,7 @@ async function tileWindows(request: TileRequest): Promise<void> {
       from: rectOf(move.window),
       to: move.rect,
     })),
-    ({ window, desktopId }, rect) =>
+    async ({ window, desktopId }, rect) =>
       WindowManagement.setWindowBounds({
         id: window.id,
         desktopId,
@@ -215,17 +219,20 @@ async function tileWindows(request: TileRequest): Promise<void> {
   if (failures.size === 0 && skipped === 0) {
     await showToast({
       style: Toast.Style.Success,
-      title: `${verb} ${tiled} ${tiled === 1 ? "window" : "windows"}`,
+      title: `${verb} ${String(tiled)} ${tiled === 1 ? "window" : "windows"}`,
     });
+
     return;
   }
   const notes = [
-    skipped > 0 ? `${skipped} could not be moved or resized` : undefined,
+    skipped > 0
+      ? `${String(skipped)} could not be moved or resized`
+      : undefined,
     failures.size === 0 ? undefined : String([...failures.values()][0]),
   ].filter((note) => note !== undefined);
   await showToast({
     style: Toast.Style.Failure,
-    title: `${verb} ${tiled} of ${moves.length + skipped} windows`,
+    title: `${verb} ${String(tiled)} of ${String(moves.length + skipped)} windows`,
     message: notes.join("; "),
   });
 }

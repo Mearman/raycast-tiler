@@ -18,5 +18,6 @@ export const mainStack: Layout = (count, area) => {
     width: area.width - mainWidth,
     height: area.height,
   };
+
   return [main, ...rows(count - 1, stack)];
 };

@@ -1,4 +1,4 @@
-import type { Rect } from "./layouts";
+import type { Rect } from "./layouts/types";
 
 export const DIRECTIONS = ["left", "right", "up", "down"] as const;
 
@@ -15,8 +15,8 @@ export function neighbourInDirection(
   direction: Direction,
 ): number | undefined {
   const origin = slots[from];
-  if (origin === undefined) throw new Error(`No slot at index ${from}`);
-  const centre = (rect: Rect) => ({
+  if (origin === undefined) throw new Error(`No slot at index ${String(from)}`);
+  const centre = (rect: Readonly<Rect>) => ({
     x: rect.x + rect.width / 2,
     y: rect.y + rect.height / 2,
   });
@@ -39,5 +39,6 @@ export function neighbourInDirection(
       (distance === best.distance && across < best.across);
     if (better) best = { index, distance, across };
   });
+
   return best?.index;
 }

@@ -1,11 +1,15 @@
-import type { Rect } from "./layouts";
+import type { Rect } from "./layouts/types";
 
-export type Point = { x: number; y: number };
+export interface Point {
+  x: number;
+  y: number;
+}
 
 function at<T>(items: readonly T[], index: number): T {
   const item = items[index];
   if (item === undefined)
-    throw new Error(`Index ${index} is outside the matrix`);
+    throw new Error(`Index ${String(index)} is outside the matrix`);
+
   return item;
 }
 
@@ -33,7 +37,7 @@ export function minimumCostAssignment(cost: readonly number[][]): number[] {
       let delta = Infinity;
       let nextColumn = 0;
       for (let candidate = 1; candidate <= size; candidate++) {
-        if (visited[candidate]) continue;
+        if (visited[candidate] === true) continue;
         const reduced =
           at(at(cost, currentRow - 1), candidate - 1) -
           at(rowPotential, currentRow) -
@@ -48,7 +52,7 @@ export function minimumCostAssignment(cost: readonly number[][]): number[] {
         }
       }
       for (let index = 0; index <= size; index++) {
-        if (visited[index]) {
+        if (visited[index] === true) {
           const matchedRow = at(rowOfColumn, index);
           rowPotential[matchedRow] = at(rowPotential, matchedRow) + delta;
           columnPotential[index] = at(columnPotential, index) - delta;
@@ -69,6 +73,7 @@ export function minimumCostAssignment(cost: readonly number[][]): number[] {
   for (let column = 1; column <= size; column++) {
     columnOfRow[at(rowOfColumn, column) - 1] = column - 1;
   }
+
   return columnOfRow;
 }
 
@@ -90,6 +95,7 @@ export function assignToNearestSlots<T>(
   }));
   const cost = items.map((item) => {
     const centre = centreOf(item);
+
     return slotCentres.map(
       (slotCentre) =>
         (centre.x - slotCentre.x) ** 2 + (centre.y - slotCentre.y) ** 2,
@@ -99,5 +105,6 @@ export function assignToNearestSlots<T>(
   minimumCostAssignment(cost).forEach((slotIndex, itemIndex) => {
     ordered[slotIndex] = at(items, itemIndex);
   });
+
   return ordered;
 }

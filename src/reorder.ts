@@ -1,5 +1,5 @@
 import { neighbourInDirection, type Direction } from "./direction";
-import type { Rect } from "./layouts";
+import type { Rect } from "./layouts/types";
 
 export const REORDER_ACTIONS = [
   "left",
@@ -45,6 +45,7 @@ export function swapActive<T>(
     throw new Error("Index is outside the items");
   result[to] = active;
   result[from] = displaced;
+
   return result;
 }
 
@@ -53,6 +54,7 @@ export function rotate<T>(items: readonly T[], offset: number): T[] {
   return items.map((_, slot) => {
     const item = items[wrap(slot - offset, items.length)];
     if (item === undefined) throw new Error("Index is outside the items");
+
     return item;
   });
 }
@@ -70,6 +72,7 @@ export function moveActiveTo<T>(
   const active = items.find(isActive);
   if (active === undefined) return undefined;
   const others = items.filter((item) => item !== active);
+
   return edge === "start" ? [active, ...others] : [...others, active];
 }
 
@@ -95,5 +98,6 @@ export function swapInDirection<T>(
     throw new Error("Index is outside the items");
   result[to] = active;
   result[from] = displaced;
+
   return result;
 }

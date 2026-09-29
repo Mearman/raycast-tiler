@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { layoutWindows } from "./layouts";
+import { layoutWindows } from "./layouts/layout-windows";
 import {
   isReorderAction,
   moveActiveTo,
@@ -49,6 +49,9 @@ describe("swapActive", () => {
 });
 
 describe("rotate", () => {
+  // Rotating by the list length is a full turn.
+  const FULL_TURN = 3;
+
   it("moves every item one slot forward, the last to the first", () => {
     expect(rotate(["a", "b", "c"], 1)).toEqual(["c", "a", "b"]);
   });
@@ -58,7 +61,7 @@ describe("rotate", () => {
   });
 
   it("is the identity for a full turn and for nothing to rotate", () => {
-    expect(rotate(["a", "b", "c"], 3)).toEqual(["a", "b", "c"]);
+    expect(rotate(["a", "b", "c"], FULL_TURN)).toEqual(["a", "b", "c"]);
     expect(rotate([], 1)).toEqual([]);
   });
 });
@@ -99,9 +102,10 @@ describe("moveActiveTo", () => {
 });
 
 describe("swapInDirection", () => {
+  const GRID_WINDOW_COUNT = 4;
   const slots = layoutWindows(
     "grid",
-    4,
+    GRID_WINDOW_COUNT,
     { x: 0, y: 0, width: 200, height: 200 },
     { value: 0, unit: "points", edge: true, between: true },
   );

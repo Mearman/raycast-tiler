@@ -1,18 +1,21 @@
 import {
   Action,
   ActionPanel,
-  Application,
+  type Application,
   Color,
   getApplications,
   Icon,
   Keyboard,
   List,
 } from "@raycast/api";
-import { usePromise } from "@raycast/utils";
+import { showFailureToast, usePromise } from "@raycast/utils";
 import { move, toggle, type AppLists } from "./filter";
 import { loadLists, saveLists } from "./storage";
 
-type Row = { app: Application; bundleId: string };
+interface Row {
+  app: Application;
+  bundleId: string;
+}
 
 const SECTIONS = ["Excluded", "Included", "Other"] as const;
 type Section = (typeof SECTIONS)[number];
@@ -20,13 +23,19 @@ type Section = (typeof SECTIONS)[number];
 function sectionOf(row: Row, lists: AppLists): Section {
   if (lists.exclude.includes(row.bundleId)) return "Excluded";
   if (lists.include.includes(row.bundleId)) return "Included";
+
   return "Other";
 }
 
 /** Included applications keep the include list's order, which App Priority uses; the others are alphabetical. */
-function rowsIn(section: Section, rows: Row[], lists: AppLists): Row[] {
+function rowsIn(
+  section: Section,
+  rows: readonly Row[],
+  lists: AppLists,
+): Row[] {
   const inSection = rows.filter((row) => sectionOf(row, lists) === section);
   if (section !== "Included") return inSection;
+
   return inSection.sort(
     (a, b) =>
       lists.include.indexOf(a.bundleId) - lists.include.indexOf(b.bundleId),
@@ -46,8 +55,10 @@ export default function Command() {
   );
   rows.sort((a, b) => a.app.name.localeCompare(b.app.name));
 
-  async function update(next: AppLists): Promise<void> {
-    await mutate(saveLists(next), { optimisticUpdate: () => next });
+  function update(next: AppLists): void {
+    mutate(saveLists(next), { optimisticUpdate: () => next }).catch(
+      showFailureToast,
+    );
   }
 
   return (
@@ -79,7 +90,7 @@ export default function Command() {
                       ? [
                           {
                             tag: {
-                              value: `Included ${lists.include.indexOf(row.bundleId) + 1}`,
+                              value: `Included ${String(lists.include.indexOf(row.bundleId) + 1)}`,
                               color: Color.Green,
                             },
                           },
@@ -95,12 +106,12 @@ export default function Command() {
                           : "Add to Exclude List"
                       }
                       icon={Icon.MinusCircle}
-                      onAction={() =>
+                      onAction={() => {
                         update({
                           ...lists,
                           exclude: toggle(lists.exclude, row.bundleId),
-                        })
-                      }
+                        });
+                      }}
                     />
                     <Action
                       title={
@@ -109,12 +120,12 @@ export default function Command() {
                           : "Add to Include List"
                       }
                       icon={Icon.PlusCircle}
-                      onAction={() =>
+                      onAction={() => {
                         update({
                           ...lists,
                           include: toggle(lists.include, row.bundleId),
-                        })
-                      }
+                        });
+                      }}
                     />
                     {section === "Included" && (
                       <ActionPanel.Section title="Priority">
@@ -122,23 +133,23 @@ export default function Command() {
                           title="Move up in Include List"
                           icon={Icon.ArrowUp}
                           shortcut={Keyboard.Shortcut.Common.MoveUp}
-                          onAction={() =>
+                          onAction={() => {
                             update({
                               ...lists,
                               include: move(lists.include, row.bundleId, -1),
-                            })
-                          }
+                            });
+                          }}
                         />
                         <Action
                           title="Move Down in Include List"
                           icon={Icon.ArrowDown}
                           shortcut={Keyboard.Shortcut.Common.MoveDown}
-                          onAction={() =>
+                          onAction={() => {
                             update({
                               ...lists,
                               include: move(lists.include, row.bundleId, 1),
-                            })
-                          }
+                            });
+                          }}
                         />
                       </ActionPanel.Section>
                     )}

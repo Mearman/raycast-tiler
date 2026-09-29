@@ -1,6 +1,6 @@
 import { LocalStorage } from "@raycast/api";
 import { isAppLists, type AppLists } from "./filter";
-import { isLayoutId, type LayoutId } from "./layouts";
+import { isLayoutId, type LayoutId } from "./layouts/types";
 import { isScope, type Scope } from "./scope";
 
 const KEY = "app-lists";
@@ -12,6 +12,7 @@ export async function loadLists(): Promise<AppLists> {
   const parsed: unknown = JSON.parse(raw);
   if (!isAppLists(parsed))
     throw new Error("Stored application lists are malformed");
+
   return parsed;
 }
 
@@ -22,7 +23,10 @@ export async function saveLists(lists: AppLists): Promise<void> {
 const LAST_TILING_KEY = "last-tiling";
 
 /** What the most recent tiling command arranged, so reorder commands work on the same layout. */
-export type LastTiling = { scope: Scope; layout: LayoutId };
+export interface LastTiling {
+  scope: Scope;
+  layout: LayoutId;
+}
 
 function isLastTiling(value: unknown): value is LastTiling {
   return (
@@ -41,9 +45,12 @@ export async function loadLastTiling(): Promise<LastTiling | undefined> {
   if (raw === undefined) return undefined;
   const parsed: unknown = JSON.parse(raw);
   if (!isLastTiling(parsed)) throw new Error("Stored last tiling is malformed");
+
   return parsed;
 }
 
-export async function saveLastTiling(tiling: LastTiling): Promise<void> {
+export async function saveLastTiling(
+  tiling: Readonly<LastTiling>,
+): Promise<void> {
   await LocalStorage.setItem(LAST_TILING_KEY, JSON.stringify(tiling));
 }

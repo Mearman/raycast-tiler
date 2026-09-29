@@ -6,11 +6,6 @@ import { rows } from "./rows";
 import { spiral } from "./spiral";
 import type { Layout, LayoutId, Rect } from "./types";
 
-export type { Gap, GapUnit } from "./gap";
-export { GAP_UNITS, isGapUnit } from "./gap";
-export type { LayoutId, Rect } from "./types";
-export { isLayoutId, LAYOUT_IDS } from "./types";
-
 const LAYOUTS: Record<LayoutId, Layout> = {
   grid,
   columns,
@@ -27,8 +22,8 @@ const LAYOUTS: Record<LayoutId, Layout> = {
 export function layoutWindows(
   id: LayoutId,
   count: number,
-  area: Rect,
-  gap: Gap,
+  area: Readonly<Rect>,
+  gap: Readonly<Gap>,
 ): Rect[] {
   return LAYOUTS[id](count, area).map((slot) => {
     const shrunk = applyGap(slot, area, gap);
@@ -40,6 +35,7 @@ export function layoutWindows(
     };
     if (rect.width < 1 || rect.height < 1)
       throw new Error("The gap leaves no room for a window; reduce it");
+
     return rect;
   });
 }

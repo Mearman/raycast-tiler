@@ -3,6 +3,7 @@ import { assignToNearestSlots, minimumCostAssignment } from "./proximity";
 
 function permutations(size: number): number[][] {
   if (size === 0) return [[]];
+
   return permutations(size - 1).flatMap((shorter) =>
     Array.from({ length: size }, (_, position) => [
       ...shorter.slice(0, position),
@@ -12,27 +13,49 @@ function permutations(size: number): number[][] {
   );
 }
 
-function totalCost(cost: number[][], assignment: number[]): number {
+function totalCost(
+  cost: readonly number[][],
+  assignment: readonly number[],
+): number {
   return assignment.reduce(
     (total, column, row) => total + (cost[row]?.[column] ?? Infinity),
     0,
   );
 }
 
+/** Multiplier of the linear congruential generator (Numerical Recipes parameters). */
+const LCG_MULTIPLIER = 1664525;
+/** Increment of the linear congruential generator. */
+const LCG_INCREMENT = 1013904223;
+/** Modulus of the linear congruential generator, 2 to the power 32. */
+const LCG_MODULUS = 4294967296;
+/** Discards the low-order bits of the generator state, which have short periods. */
+const LCG_LOW_BITS_DIVISOR = 65536;
+/** Exclusive upper bound of each generated matrix cost. */
+const COST_RANGE = 100;
+/** Largest matrix size checked against brute force, bounded by the factorial number of permutations. */
+const MAX_BRUTE_FORCE_SIZE = 6;
+/** Number of seeds tried for each matrix size. */
+const SEEDS_PER_SIZE = 25;
+/** Prime that spreads consecutive seeds across the generator's state space. */
+const SEED_STRIDE = 7919;
+
 function pseudoRandomMatrix(size: number, seed: number): number[][] {
   let state = seed;
   const next = () => {
-    state = (state * 1664525 + 1013904223) % 4294967296;
-    return Math.floor(state / 65536) % 100;
+    state = (state * LCG_MULTIPLIER + LCG_INCREMENT) % LCG_MODULUS;
+
+    return Math.floor(state / LCG_LOW_BITS_DIVISOR) % COST_RANGE;
   };
+
   return Array.from({ length: size }, () => Array.from({ length: size }, next));
 }
 
 describe("minimumCostAssignment", () => {
   it("matches the brute-force optimum on small matrices", () => {
-    for (let size = 1; size <= 6; size++) {
-      for (let seed = 1; seed <= 25; seed++) {
-        const cost = pseudoRandomMatrix(size, seed * 7919 + size);
+    for (let size = 1; size <= MAX_BRUTE_FORCE_SIZE; size++) {
+      for (let seed = 1; seed <= SEEDS_PER_SIZE; seed++) {
+        const cost = pseudoRandomMatrix(size, seed * SEED_STRIDE + size);
         const best = Math.min(
           ...permutations(size).map((assignment) =>
             totalCost(cost, assignment),
