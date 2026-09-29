@@ -1,3 +1,17 @@
+## [1.0.1](https://github.com/Mearman/raycast-tiler/compare/v1.0.0...v1.0.1) (2026-09-29)
+
+### Bug Fixes
+
+* stop turbo replacing the AGENTS.md symlink with its own agent block ([9c5b734](https://github.com/Mearman/raycast-tiler/commit/9c5b73490e975227037c7044d4b404ec003998a9))
+
+### Documentation
+
+* describe the turbo tasks and the scripts that use them ([1bd3b08](https://github.com/Mearman/raycast-tiler/commit/1bd3b08a430e5290c88734889ed4f21d6b7ab082))
+
+### Build System
+
+* run the tasks through turbo with type generation as a dependency ([81ff789](https://github.com/Mearman/raycast-tiler/commit/81ff7895cb37fa4fa7a948409cad299e922a84f4))
+
 ## 1.0.0 (2026-09-29)
 
 ### Features
