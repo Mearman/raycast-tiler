@@ -1,3 +1,9 @@
+## [1.2.0](https://github.com/Mearman/raycast-tiler/compare/v1.1.0...v1.2.0) (2026-09-29)
+
+### Features
+
+* animate windows one at a time by default ([1039369](https://github.com/Mearman/raycast-tiler/commit/10393691a3c345e6800dfee988e4b6c4e62e6f84))
+
 ## [1.1.0](https://github.com/Mearman/raycast-tiler/compare/v1.0.1...v1.1.0) (2026-09-29)
 
 ### Features
