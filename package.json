@@ -17,21 +17,11 @@
     {
       "name": "tile-current-app",
       "title": "Tile App",
-      "description": "Tile every window of the frontmost application in the layout chosen in preferences.",
+      "description": "Tile every window of the frontmost application in the layout chosen in preferences, or in the layout given as the optional argument.",
       "mode": "no-view",
       "keywords": [
         "current",
         "application",
-        "arrange",
-        "layout"
-      ]
-    },
-    {
-      "name": "tile-layout",
-      "title": "Tile with Layout",
-      "description": "Tile windows in a layout you choose when you run the command, ignoring the layout preference.",
-      "mode": "no-view",
-      "keywords": [
         "arrange",
         "layout"
       ],
@@ -39,8 +29,8 @@
         {
           "name": "layout",
           "type": "dropdown",
-          "placeholder": "Layout",
-          "required": true,
+          "placeholder": "Layout (default: preference)",
+          "required": false,
           "data": [
             {
               "title": "Grid",
@@ -63,35 +53,49 @@
               "value": "spiral"
             }
           ]
-        },
-        {
-          "name": "scope",
-          "type": "dropdown",
-          "placeholder": "Windows (default: all on desktop)",
-          "required": false,
-          "data": [
-            {
-              "title": "All Windows",
-              "value": "desktop"
-            },
-            {
-              "title": "App Windows",
-              "value": "current-app"
-            }
-          ]
         }
       ]
     },
     {
       "name": "tile-desktop",
       "title": "Tile Windows",
-      "description": "Tile every window on the active desktop in the layout chosen in preferences.",
+      "description": "Tile every window on the active desktop in the layout chosen in preferences, or in the layout given as the optional argument.",
       "mode": "no-view",
       "keywords": [
         "desktop",
         "screen",
         "arrange",
         "layout"
+      ],
+      "arguments": [
+        {
+          "name": "layout",
+          "type": "dropdown",
+          "placeholder": "Layout (default: preference)",
+          "required": false,
+          "data": [
+            {
+              "title": "Grid",
+              "value": "grid"
+            },
+            {
+              "title": "Columns",
+              "value": "columns"
+            },
+            {
+              "title": "Rows",
+              "value": "rows"
+            },
+            {
+              "title": "Main + Stack",
+              "value": "main-stack"
+            },
+            {
+              "title": "Spiral",
+              "value": "spiral"
+            }
+          ]
+        }
       ]
     },
     {

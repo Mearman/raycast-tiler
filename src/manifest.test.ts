@@ -5,7 +5,11 @@ import { ORDER_IDS } from "./ordering";
 import { SCOPES } from "./scope";
 import { REORDER_ACTIONS } from "./reorder";
 
-type Argument = { name: string; data?: { value: string }[] };
+type Argument = {
+  name: string;
+  required?: boolean;
+  data?: { value: string }[];
+};
 type Command = {
   name: string;
   disabledByDefault?: boolean;
@@ -44,6 +48,15 @@ describe("manifest", () => {
     expect(unit?.data?.map((option) => option.value)).toEqual([...GAP_UNITS]);
   });
 
+  it.each(SCOPES.flatMap((scope) => LAYOUT_IDS.map((id) => [scope, id])))(
+    "registers a %s command for the %s layout",
+    (scope, id) => {
+      expect(manifest.commands.map((command) => command.name)).toContain(
+        `tile-${scope}-${id}`,
+      );
+    },
+  );
+
   it("offers every reorder action in the Move Window argument", () => {
     const command = manifest.commands.find((c) => c.name === "move-window");
     const action = command?.arguments?.find((arg) => arg.name === "action");
@@ -66,23 +79,32 @@ describe("manifest", () => {
     expect(order?.data?.map((option) => option.value)).toEqual([...ORDER_IDS]);
   });
 
-  it.each(SCOPES.flatMap((scope) => LAYOUT_IDS.map((id) => [scope, id])))(
-    "registers a %s command for the %s layout",
-    (scope, id) => {
-      expect(manifest.commands.map((command) => command.name)).toContain(
-        `tile-${scope}-${id}`,
-      );
+  it.each(["tile-desktop", "tile-current-app"])(
+    "offers every layout as an optional argument of %s",
+    (name) => {
+      const layout = manifest.commands
+        .find((command) => command.name === name)
+        ?.arguments?.find((arg) => arg.name === "layout");
+      expect(layout?.required).toBe(false);
+      expect(layout?.data?.map((option) => option.value)).toEqual([
+        ...LAYOUT_IDS,
+      ]);
     },
   );
 
-  it("offers every layout and scope in the Tile with Layout arguments", () => {
-    const command = manifest.commands.find((c) => c.name === "tile-layout");
-    const values = (name: string) =>
-      command?.arguments
-        ?.find((arg) => arg.name === name)
-        ?.data?.map((option) => option.value);
-    expect(values("layout")).toEqual([...LAYOUT_IDS]);
-    expect(values("scope")?.sort()).toEqual([...SCOPES].sort());
+  it("offers every reorder action in the Move Window argument", () => {
+    const command = manifest.commands.find((c) => c.name === "move-window");
+    const action = command?.arguments?.find((arg) => arg.name === "action");
+    expect(action?.data?.map((option) => option.value)).toEqual([
+      ...REORDER_ACTIONS,
+    ]);
+  });
+
+  it.each(REORDER_ACTIONS)("registers a dedicated command for %s", (action) => {
+    const name = action.startsWith("rotate-")
+      ? `rotate-windows-${action.slice("rotate-".length)}`
+      : `move-window-${action}`;
+    expect(manifest.commands.map((command) => command.name)).toContain(name);
   });
 
   it("disables only the dedicated tile and move commands by default", () => {
