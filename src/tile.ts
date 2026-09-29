@@ -7,7 +7,13 @@ import {
 import { showFailureToast } from "@raycast/utils";
 import { animateMoves } from "./animation";
 import { isAllowed } from "./filter";
-import { isLayoutId, layoutWindows, type LayoutId, type Rect } from "./layouts";
+import {
+  isGapUnit,
+  isLayoutId,
+  layoutWindows,
+  type LayoutId,
+  type Rect,
+} from "./layouts";
 import { isOrderId, orderBySlot } from "./ordering";
 import { loadLists } from "./storage";
 
@@ -15,6 +21,14 @@ import { loadLists } from "./storage";
 export type Scope = "current-app" | "desktop";
 
 type Window = WindowManagement.Window;
+
+function parseNumber(name: string, raw: string | undefined): number {
+  if (raw === undefined || raw.trim() === "") return 0;
+  const value = Number(raw);
+  if (!Number.isFinite(value))
+    throw new Error(`${name} must be a number, got "${raw}"`);
+  return value;
+}
 
 function parseNonNegative(name: string, raw: string | undefined): number {
   if (raw === undefined || raw.trim() === "") return 0;
@@ -63,6 +77,7 @@ async function tileWindows(
     layout: preferredLayout,
     windowOrder,
     gap: rawGap,
+    gapUnit,
     moveDuration: rawMoveDuration,
     resizeDuration: rawResizeDuration,
   } = getPreferenceValues<Preferences>();
@@ -70,7 +85,8 @@ async function tileWindows(
   if (!isLayoutId(layout)) throw new Error(`Unknown layout "${layout}"`);
   if (!isOrderId(windowOrder))
     throw new Error(`Unknown window order "${windowOrder}"`);
-  const gap = parseNonNegative("Gap", rawGap);
+  if (!isGapUnit(gapUnit)) throw new Error(`Unknown gap unit "${gapUnit}"`);
+  const gap = { value: parseNumber("Gap", rawGap), unit: gapUnit };
   const durations = {
     moveMs: parseNonNegative("Move duration", rawMoveDuration),
     resizeMs: parseNonNegative("Resize duration", rawResizeDuration),

@@ -1,11 +1,13 @@
 import { columns } from "./columns";
-import { inset } from "./geometry";
+import { applyGap, type Gap } from "./gap";
 import { grid } from "./grid";
 import { mainStack } from "./main-stack";
 import { rows } from "./rows";
 import { spiral } from "./spiral";
 import type { Layout, LayoutId, Rect } from "./types";
 
+export type { Gap, GapUnit } from "./gap";
+export { GAP_UNITS, isGapUnit } from "./gap";
 export type { LayoutId, Rect } from "./types";
 export { isLayoutId, LAYOUT_IDS } from "./types";
 
@@ -18,24 +20,26 @@ const LAYOUTS: Record<LayoutId, Layout> = {
 };
 
 /**
- * Lays out `count` windows in `area` using the named layout, leaving `gap` points between windows and around the area's edge.
+ * Lays out `count` windows in `area` using the named layout, leaving `gap` between windows and around the area's edge (see {@link Gap}).
  *
- * The layout runs on the area inset by half the gap and each result is inset by half the gap again, so neighbours end up exactly `gap` apart. Rectangles are rounded to whole points.
+ * Rectangles are rounded to whole points. Throws when the gap leaves a window with no width or height.
  */
 export function layoutWindows(
   id: LayoutId,
   count: number,
   area: Rect,
-  gap: number,
+  gap: Gap,
 ): Rect[] {
-  const half = gap / 2;
-  return LAYOUTS[id](count, inset(area, half)).map((rect) => {
-    const shrunk = inset(rect, half);
-    return {
+  return LAYOUTS[id](count, area).map((slot) => {
+    const shrunk = applyGap(slot, area, gap);
+    const rect = {
       x: Math.round(shrunk.x),
       y: Math.round(shrunk.y),
       width: Math.round(shrunk.width),
       height: Math.round(shrunk.height),
     };
+    if (rect.width < 1 || rect.height < 1)
+      throw new Error("The gap leaves no room for a window; reduce it");
+    return rect;
   });
 }

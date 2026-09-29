@@ -225,11 +225,33 @@
     {
       "name": "gap",
       "title": "Gap",
-      "description": "Space in points between windows and around the screen edge. Must be a non-negative number.",
+      "description": "Space between windows and around the screen edge, in the unit below. Negative values make neighbouring windows overlap; the screen edge is never pushed outwards.",
       "type": "textfield",
       "required": false,
       "default": "0",
       "placeholder": "0"
+    },
+    {
+      "name": "gapUnit",
+      "title": "Gap Unit",
+      "description": "What the gap is measured in. Percentages apply per axis: of each window's own width or height, or of the screen's width or height.",
+      "type": "dropdown",
+      "required": false,
+      "default": "points",
+      "data": [
+        {
+          "title": "Points",
+          "value": "points"
+        },
+        {
+          "title": "Percent of Window",
+          "value": "window"
+        },
+        {
+          "title": "Percent of Screen",
+          "value": "screen"
+        }
+      ]
     },
     {
       "name": "moveDuration",

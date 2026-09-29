@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { LAYOUT_IDS } from "./layouts";
+import { GAP_UNITS, LAYOUT_IDS } from "./layouts";
 import { ORDER_IDS } from "./ordering";
 
 type Command = { name: string; disabledByDefault?: boolean };
@@ -31,6 +31,11 @@ describe("manifest", () => {
     expect(layout?.data?.map((option) => option.value)).toEqual([
       ...LAYOUT_IDS,
     ]);
+  });
+
+  it("offers every gap unit in the gap unit preference", () => {
+    const unit = manifest.preferences.find((pref) => pref.name === "gapUnit");
+    expect(unit?.data?.map((option) => option.value)).toEqual([...GAP_UNITS]);
   });
 
   it("offers every window order in the window order preference", () => {
