@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { GAP_UNITS, LAYOUT_IDS } from "./layouts";
 import { ORDER_IDS } from "./ordering";
+import { SCOPES } from "./scope";
 import { REORDER_ACTIONS } from "./reorder";
 
 type Argument = { name: string; data?: { value: string }[] };
@@ -30,7 +31,6 @@ const parsed: unknown = JSON.parse(
 if (!isManifest(parsed)) throw new Error("package.json is not a manifest");
 const manifest = parsed;
 
-const SCOPES = ["desktop", "current-app"] as const;
 describe("manifest", () => {
   it("offers every layout in the layout preference", () => {
     const layout = manifest.preferences.find((pref) => pref.name === "layout");
@@ -75,10 +75,25 @@ describe("manifest", () => {
     },
   );
 
-  it("disables only the dedicated move commands by default", () => {
-    const dedicated = REORDER_ACTIONS.filter(
-      (action) => !action.startsWith("rotate-"),
-    ).map((action) => `move-window-${action}`);
+  it("offers every layout and scope in the Tile with Layout arguments", () => {
+    const command = manifest.commands.find((c) => c.name === "tile-layout");
+    const values = (name: string) =>
+      command?.arguments
+        ?.find((arg) => arg.name === name)
+        ?.data?.map((option) => option.value);
+    expect(values("layout")).toEqual([...LAYOUT_IDS]);
+    expect(values("scope")?.sort()).toEqual([...SCOPES].sort());
+  });
+
+  it("disables only the dedicated tile and move commands by default", () => {
+    const dedicated = [
+      ...SCOPES.flatMap((scope) =>
+        LAYOUT_IDS.map((id) => `tile-${scope}-${id}`),
+      ),
+      ...REORDER_ACTIONS.filter((action) => !action.startsWith("rotate-")).map(
+        (action) => `move-window-${action}`,
+      ),
+    ];
     const disabled = manifest.commands
       .filter((command) => command.disabledByDefault === true)
       .map((command) => command.name);

@@ -27,6 +27,62 @@
       ]
     },
     {
+      "name": "tile-layout",
+      "title": "Tile with Layout",
+      "description": "Tile windows in a layout you choose when you run the command, ignoring the layout preference.",
+      "mode": "no-view",
+      "keywords": [
+        "arrange",
+        "layout"
+      ],
+      "arguments": [
+        {
+          "name": "layout",
+          "type": "dropdown",
+          "placeholder": "Layout",
+          "required": true,
+          "data": [
+            {
+              "title": "Grid",
+              "value": "grid"
+            },
+            {
+              "title": "Columns",
+              "value": "columns"
+            },
+            {
+              "title": "Rows",
+              "value": "rows"
+            },
+            {
+              "title": "Main + Stack",
+              "value": "main-stack"
+            },
+            {
+              "title": "Spiral",
+              "value": "spiral"
+            }
+          ]
+        },
+        {
+          "name": "scope",
+          "type": "dropdown",
+          "placeholder": "Windows (default: all on desktop)",
+          "required": false,
+          "data": [
+            {
+              "title": "All Windows",
+              "value": "desktop"
+            },
+            {
+              "title": "App Windows",
+              "value": "current-app"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "tile-desktop",
       "title": "Tile Windows",
       "description": "Tile every window on the active desktop in the layout chosen in preferences.",
@@ -54,7 +110,8 @@
         "screen",
         "arrange",
         "layout"
-      ]
+      ],
+      "disabledByDefault": true
     },
     {
       "name": "tile-desktop-columns",
@@ -66,7 +123,8 @@
         "screen",
         "arrange",
         "layout"
-      ]
+      ],
+      "disabledByDefault": true
     },
     {
       "name": "tile-desktop-rows",
@@ -78,7 +136,8 @@
         "screen",
         "arrange",
         "layout"
-      ]
+      ],
+      "disabledByDefault": true
     },
     {
       "name": "tile-desktop-main-stack",
@@ -90,7 +149,8 @@
         "screen",
         "arrange",
         "layout"
-      ]
+      ],
+      "disabledByDefault": true
     },
     {
       "name": "tile-desktop-spiral",
@@ -102,7 +162,8 @@
         "screen",
         "arrange",
         "layout"
-      ]
+      ],
+      "disabledByDefault": true
     },
     {
       "name": "tile-current-app-grid",
@@ -114,7 +175,8 @@
         "application",
         "arrange",
         "layout"
-      ]
+      ],
+      "disabledByDefault": true
     },
     {
       "name": "tile-current-app-columns",
@@ -126,7 +188,8 @@
         "application",
         "arrange",
         "layout"
-      ]
+      ],
+      "disabledByDefault": true
     },
     {
       "name": "tile-current-app-rows",
@@ -138,7 +201,8 @@
         "application",
         "arrange",
         "layout"
-      ]
+      ],
+      "disabledByDefault": true
     },
     {
       "name": "tile-current-app-main-stack",
@@ -150,7 +214,8 @@
         "application",
         "arrange",
         "layout"
-      ]
+      ],
+      "disabledByDefault": true
     },
     {
       "name": "tile-current-app-spiral",
@@ -162,7 +227,8 @@
         "application",
         "arrange",
         "layout"
-      ]
+      ],
+      "disabledByDefault": true
     },
     {
       "name": "move-window-forward",
