@@ -81,12 +81,15 @@ Raycast-bound:
 - `disabledByDefault` only applies when Raycast first installs the extension or first sees a new command. An existing install keeps the enabled state it has. Change it in Raycast Settings, Extensions, or import the extension again.
 - Raycast preferences cannot hold a button, and the API cannot enable or disable commands.
 - Stryker only loads `stryker.config.ts` when it is named: `stryker run stryker.config.ts`. Without the path, Stryker ignores the file and mutates every source file.
+- The semantic-release notes generator loads an older `conventional-changelog-writer` that cannot render the `conventionalcommits` preset, which produces a changelog with a version heading and nothing under it. `pnpm-workspace.yaml` overrides the writer to a newer major. Remove the override only after checking that the notes still list every section.
 - TypeScript is pinned to version 6, because `typescript-eslint` does not support version 7.
-- The global pnpm setting `ignore-scripts=true` stops the `prepare` script, so `husky` does not install its own hooks path here. The machine-wide hook dispatcher runs the scripts in `.husky/` instead. `pnpm-workspace.yaml` marks the `esbuild` build script as not allowed.
+- `pnpm install` runs `prepare`, and husky would set a local hooks path that replaces a machine-wide hook dispatcher configured in the global git configuration. The `prepare` script therefore runs husky only when no hooks path is configured. Where a global dispatcher exists, it runs the scripts in `.husky/` itself. `pnpm-workspace.yaml` marks the `esbuild` build script as not allowed.
 
 ## Contributing
 
-Use conventional commits with a subject of at most 100 characters. Commitlint checks it at commit time. The pre-commit hook runs `eslint --fix` on staged TypeScript files through lint-staged. The pre-push hook runs the type check, the lint and the tests. The default branch is `main`.
+Use conventional commits with a subject of at most 100 characters. `release.config.ts` lists the allowed types, and commitlint, the release rules and the changelog sections all read that list. Every type triggers a release: `feat` a minor one and every other type a patch. A breaking change triggers a major one. Commitlint checks the commit at commit time and again in CI. The pre-commit hook runs `eslint --fix` on staged TypeScript files through lint-staged. The pre-push hook runs the type check, the lint and the tests. The default branch is `main`.
+
+Every push to `main` runs the checks, then semantic-release. It bumps the version, writes `CHANGELOG.md`, tags the release, creates the GitHub Release, and commits the changelog and `package.json`. A separate job then publishes the package to GitHub Packages as the scoped alias `@mearman/raycast-tiler`, because GitHub Packages requires a name scoped to the repository owner. That job renames the package at publish time, so `package.json` keeps the Raycast extension name. Publishing to the Raycast store is a separate manual step.
 
 ## References
 
