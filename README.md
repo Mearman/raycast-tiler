@@ -22,14 +22,17 @@ Extension preferences: Layout (grid, columns, rows, main and stack, spiral), Gri
 
 ## Install
 
-The extension is not in the Raycast store, so install it from source. You need macOS, Raycast, Node and pnpm.
+The extension is not in the Raycast store, so install it from source. You need macOS, Raycast, Node and pnpm. No development server has to keep running.
 
 1. Clone the repository: `git clone https://github.com/Mearman/raycast-tiler.git`.
-2. In the folder, run `pnpm install`, then `pnpm dev`.
-3. `pnpm dev` imports the extension into Raycast. When it reports that the build succeeded, stop it with Control+C. The extension stays in Raycast.
-4. Open Raycast and search for **Tile Windows**. Set the layout and the other options in Raycast Settings, Extensions, Window Tiler.
+2. In the folder, run `pnpm install`.
+3. In Raycast, run the **Import Extension** command and select the repository folder.
+4. Run `pnpm build` after the import. Importing clears the compiled commands from Raycast's copy of the extension, and Raycast reports "missing executable" until a build has written them again.
+5. Open Raycast and search for **Tile Windows**. Set the layout and the other options in Raycast Settings, Extensions, Window Tiler.
 
-To update, run `git pull` and `pnpm install`, then `pnpm dev` again and stop it once it has built. To remove the extension, use Raycast Settings, Extensions, select Window Tiler and remove it.
+`pnpm dev` does steps 3 and 4 in one go: it imports the extension if Raycast does not have it yet, and builds it. Stop it with Control+C once it has built. The extension stays in Raycast.
+
+To update, run `git pull` and `pnpm install`, then `pnpm build`. To remove the extension, use Raycast Settings, Extensions, select Window Tiler and remove it.
 
 ## Getting started
 
