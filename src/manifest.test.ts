@@ -75,10 +75,14 @@ describe("manifest", () => {
     },
   );
 
-  it("enables every command by default", () => {
-    expect(
-      manifest.commands.filter((command) => command.disabledByDefault),
-    ).toEqual([]);
+  it("disables only the dedicated move commands by default", () => {
+    const dedicated = REORDER_ACTIONS.filter(
+      (action) => !action.startsWith("rotate-"),
+    ).map((action) => `move-window-${action}`);
+    const disabled = manifest.commands
+      .filter((command) => command.disabledByDefault === true)
+      .map((command) => command.name);
+    expect(disabled.sort()).toEqual(dedicated.sort());
   });
 
   it("has an entry file for every command", () => {

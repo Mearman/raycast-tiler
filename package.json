@@ -173,7 +173,8 @@
         "swap",
         "next",
         "order"
-      ]
+      ],
+      "disabledByDefault": true
     },
     {
       "name": "move-window-back",
@@ -184,7 +185,8 @@
         "swap",
         "previous",
         "order"
-      ]
+      ],
+      "disabledByDefault": true
     },
     {
       "name": "move-window-start",
@@ -195,7 +197,8 @@
         "first",
         "beginning",
         "order"
-      ]
+      ],
+      "disabledByDefault": true
     },
     {
       "name": "move-window-end",
@@ -205,7 +208,8 @@
       "keywords": [
         "last",
         "order"
-      ]
+      ],
+      "disabledByDefault": true
     },
     {
       "name": "move-window-left",
@@ -215,7 +219,8 @@
       "keywords": [
         "swap",
         "west"
-      ]
+      ],
+      "disabledByDefault": true
     },
     {
       "name": "move-window-right",
@@ -225,7 +230,8 @@
       "keywords": [
         "swap",
         "east"
-      ]
+      ],
+      "disabledByDefault": true
     },
     {
       "name": "move-window-up",
@@ -235,7 +241,8 @@
       "keywords": [
         "swap",
         "north"
-      ]
+      ],
+      "disabledByDefault": true
     },
     {
       "name": "move-window-down",
@@ -245,7 +252,8 @@
       "keywords": [
         "swap",
         "south"
-      ]
+      ],
+      "disabledByDefault": true
     },
     {
       "name": "move-window",
