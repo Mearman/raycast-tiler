@@ -38,16 +38,22 @@ describe("progressAt", () => {
 
 describe("interpolateRect", () => {
   it("returns the endpoints exactly", () => {
-    expect(interpolateRect(FROM, TO, 0)).toEqual(FROM);
-    expect(interpolateRect(FROM, TO, 1)).toEqual(TO);
+    expect(interpolateRect(FROM, TO, { position: 0, size: 0 })).toEqual(FROM);
+    expect(interpolateRect(FROM, TO, { position: 1, size: 1 })).toEqual(TO);
   });
 
-  it("moves position and size together", () => {
-    expect(interpolateRect(FROM, TO, 0.5)).toEqual({
+  it("advances position and size independently", () => {
+    expect(interpolateRect(FROM, TO, { position: 0.5, size: 0.5 })).toEqual({
       x: 100,
       y: 50,
       width: 200,
       height: 75,
+    });
+    expect(interpolateRect(FROM, TO, { position: 1, size: 0 })).toEqual({
+      x: 200,
+      y: 100,
+      width: 100,
+      height: 100,
     });
   });
 });
@@ -70,7 +76,7 @@ describe("animateMoves", () => {
       async (_, rect) => {
         frames.push(rect);
       },
-      200,
+      { moveMs: 200, resizeMs: 200 },
       steppingClock(50),
     );
     expect(failures.size).toBe(0);
@@ -87,10 +93,68 @@ describe("animateMoves", () => {
       async (_, rect) => {
         frames.push(rect);
       },
-      0,
+      { moveMs: 0, resizeMs: 0 },
       steppingClock(50),
     );
     expect(frames).toEqual([TO]);
+  });
+
+  it("applies a zero-duration resize on the first frame while the move still animates", async () => {
+    const frames: Rect[] = [];
+    await animateMoves(
+      [{ subject: "a", from: FROM, to: TO }],
+      async (_, rect) => {
+        frames.push(rect);
+      },
+      { moveMs: 200, resizeMs: 0 },
+      steppingClock(50),
+    );
+    expect(frames.length).toBeGreaterThan(2);
+    for (const frame of frames) {
+      expect(frame.width).toBe(TO.width);
+      expect(frame.height).toBe(TO.height);
+    }
+    const first = frames[0];
+    expect(first?.x).toBeGreaterThan(FROM.x);
+    expect(first?.x).toBeLessThan(TO.x);
+    expect(frames.at(-1)).toEqual(TO);
+  });
+
+  it("applies a zero-duration move on the first frame while the resize still animates", async () => {
+    const frames: Rect[] = [];
+    await animateMoves(
+      [{ subject: "a", from: FROM, to: TO }],
+      async (_, rect) => {
+        frames.push(rect);
+      },
+      { moveMs: 0, resizeMs: 200 },
+      steppingClock(50),
+    );
+    expect(frames.length).toBeGreaterThan(2);
+    for (const frame of frames) {
+      expect(frame.x).toBe(TO.x);
+      expect(frame.y).toBe(TO.y);
+    }
+    const first = frames[0];
+    expect(first?.width).toBeGreaterThan(FROM.width);
+    expect(first?.width).toBeLessThan(TO.width);
+    expect(frames.at(-1)).toEqual(TO);
+  });
+
+  it("lasts as long as the longer of the two durations", async () => {
+    const frames: Rect[] = [];
+    const stepMs = 50;
+    const resizeMs = 400;
+    await animateMoves(
+      [{ subject: "a", from: FROM, to: TO }],
+      async (_, rect) => {
+        frames.push(rect);
+      },
+      { moveMs: stepMs, resizeMs },
+      steppingClock(stepMs),
+    );
+    expect(frames).toHaveLength(resizeMs / stepMs);
+    expect(frames.at(-1)).toEqual(TO);
   });
 
   it("drops a failing subject from later frames and keeps animating the rest", async () => {
@@ -104,7 +168,7 @@ describe("animateMoves", () => {
         calls.push(subject);
         if (subject === "bad") throw new Error("cannot move");
       },
-      200,
+      { moveMs: 200, resizeMs: 200 },
       steppingClock(50),
     );
     expect([...failures.keys()]).toEqual(["bad"]);
