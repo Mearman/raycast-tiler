@@ -20,6 +20,18 @@ Extension preferences: Layout (grid, columns, rows, main and stack, spiral), Gri
 - **Gap** is the space between windows and around the screen edge. Gap Unit selects points, percent of each window, or percent of the screen. Percentages apply per axis. The two checkboxes select the screen edge, the space between windows, or both. A negative gap makes neighbouring windows overlap. It never pushes a window past the screen edge. A gap that leaves a window with no width or height is an error.
 - **Move Duration** and **Resize Duration** are in milliseconds. Windows slide and resize into place, each part eased on its own. A value of 0 makes that part instant. **Transition Order** is a checkbox that is on by default. When it is on, each window finishes moving and resizing before the next one starts, in layout order, so the whole transition takes as long as all windows added up. When it is off, all windows move together.
 
+## Install
+
+The extension is not in the Raycast store, so install it from source. You need macOS, Raycast with a Pro subscription, Node and pnpm.
+
+1. Clone the repository: `git clone https://github.com/Mearman/raycast-tiler.git`.
+2. In the folder, run `pnpm install`, then `pnpm dev`.
+3. `pnpm dev` imports the extension into Raycast. When it reports that the build succeeded, stop it with Control+C. The extension stays in Raycast.
+4. Open Raycast and search for **Tile Windows**. Set the layout and the other options in Raycast Settings, Extensions, Window Tiler.
+5. The first tiling command asks Raycast for permission to control windows. Grant it in macOS System Settings, Privacy and Security, Accessibility, if Raycast does not already have it.
+
+To update, run `git pull` and `pnpm install`, then `pnpm dev` again and stop it once it has built. To remove the extension, use Raycast Settings, Extensions, select Window Tiler and remove it.
+
 ## Getting started
 
 Prerequisites: macOS, Raycast with a Pro subscription (the window management API requires it), Node, and pnpm. Windows is not supported by that API. The extension needs no environment variables.
