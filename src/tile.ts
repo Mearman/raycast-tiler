@@ -71,7 +71,10 @@ async function windowsInScope(scope: Scope): Promise<Window[]> {
 }
 
 /** Rearranges windows already in slot order; `undefined` means this group has nothing to rearrange. */
-type Rearrange = (ordered: PlacedWindow[]) => PlacedWindow[] | undefined;
+type Rearrange = (
+  ordered: PlacedWindow[],
+  isFocused: (window: PlacedWindow) => boolean,
+) => PlacedWindow[] | undefined;
 
 type TileRequest = {
   scope: Scope;
@@ -113,6 +116,13 @@ async function tileWindows(request: TileRequest): Promise<void> {
     resizeMs: parseNonNegative("Resize duration", rawResizeDuration),
   };
 
+  // `Window.active` is true for every window of the frontmost application, so the one focused window is found by id.
+  const focusedId =
+    rearrange !== undefined || order === "active-first"
+      ? (await WindowManagement.getActiveWindow()).id
+      : undefined;
+  const isFocused = (window: PlacedWindow): boolean => window.id === focusedId;
+
   const [lists, desktops, scoped] = await Promise.all([
     loadLists(),
     WindowManagement.getDesktops(),
@@ -148,12 +158,13 @@ async function tileWindows(request: TileRequest): Promise<void> {
       rects,
       {
         boundsOf: rectOf,
-        isActive: (window) => window.active,
+        isActive: isFocused,
         bundleIdOf: (window) => window.application?.bundleId,
       },
       lists.include,
     );
-    const bySlot = rearrange === undefined ? ordered : rearrange(ordered);
+    const bySlot =
+      rearrange === undefined ? ordered : rearrange(ordered, isFocused);
     if (bySlot === undefined) return [];
     return bySlot.map((window, index) => {
       const rect = rects[index];
@@ -236,9 +247,8 @@ export type ReorderAction =
   "move-forward" | "move-back" | "rotate-forward" | "rotate-back";
 
 const REARRANGE: Record<ReorderAction, Rearrange> = {
-  "move-forward": (ordered) =>
-    swapActive(ordered, (window) => window.active, 1),
-  "move-back": (ordered) => swapActive(ordered, (window) => window.active, -1),
+  "move-forward": (ordered, isFocused) => swapActive(ordered, isFocused, 1),
+  "move-back": (ordered, isFocused) => swapActive(ordered, isFocused, -1),
   "rotate-forward": (ordered) => rotate(ordered, 1),
   "rotate-back": (ordered) => rotate(ordered, -1),
 };
