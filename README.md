@@ -22,19 +22,18 @@ Extension preferences: Layout (grid, columns, rows, main and stack, spiral), Gri
 
 ## Install
 
-The extension is not in the Raycast store, so install it from source. You need macOS, Raycast with a Pro subscription, Node and pnpm.
+The extension is not in the Raycast store, so install it from source. You need macOS, Raycast, Node and pnpm.
 
 1. Clone the repository: `git clone https://github.com/Mearman/raycast-tiler.git`.
 2. In the folder, run `pnpm install`, then `pnpm dev`.
 3. `pnpm dev` imports the extension into Raycast. When it reports that the build succeeded, stop it with Control+C. The extension stays in Raycast.
 4. Open Raycast and search for **Tile Windows**. Set the layout and the other options in Raycast Settings, Extensions, Window Tiler.
-5. The first tiling command asks Raycast for permission to control windows. Grant it in macOS System Settings, Privacy and Security, Accessibility, if Raycast does not already have it.
 
 To update, run `git pull` and `pnpm install`, then `pnpm dev` again and stop it once it has built. To remove the extension, use Raycast Settings, Extensions, select Window Tiler and remove it.
 
 ## Getting started
 
-Prerequisites: macOS, Raycast with a Pro subscription (the window management API requires it), Node, and pnpm. Windows is not supported by that API. The extension needs no environment variables.
+Prerequisites: macOS, Raycast, Node, and pnpm. Windows is not supported by the window management API. The extension needs no environment variables.
 
 ```bash
 pnpm install
@@ -91,6 +90,7 @@ Raycast-bound:
 
 ## Non-obvious behaviour
 
+- The Raycast documentation says the window management API needs a Raycast Pro subscription and prompts to upgrade without one. The extension works without a subscription on the maintainer's machine, so the documentation may be out of date. If a call ever fails with an upgrade prompt, a subscription is needed.
 - `Window.active` is `true` for every window of the frontmost application, not only the focused one. Code that looks for "the active window" then picks the first window. Compare window ids with the result of `getActiveWindow()` instead, as `src/tile.ts` does.
 - A Raycast `Desktop` has a size but no position. Tiling places windows from the point (0, 0) of the desktop. This works on the main screen. It is not verified on a second screen.
 - Raycast cannot change the stacking order of windows. With a negative gap, the windows that end up on top are those that were already on top.
