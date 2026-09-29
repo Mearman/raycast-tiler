@@ -22,7 +22,7 @@ Extension preferences: Layout (grid, columns, rows, main and stack, spiral), Gri
 
 ## Install
 
-The extension is not in the Raycast store, so install it from source. You need macOS, Raycast, Node and pnpm. No development server has to keep running.
+The extension is not in the Raycast store, so install it from source. You need macOS, Raycast, Node and pnpm. The window management API does not support Windows. The extension needs no environment variables. No development server has to keep running.
 
 1. Clone the repository: `git clone https://github.com/Mearman/raycast-tiler.git`.
 2. In the folder, run `pnpm install`.
@@ -36,14 +36,7 @@ To update, run `git pull` and `pnpm install`, then `pnpm build`. To remove the e
 
 ## Getting started
 
-Prerequisites: macOS, Raycast, Node, and pnpm. Windows is not supported by the window management API. The extension needs no environment variables.
-
-```bash
-pnpm install
-pnpm dev
-```
-
-`pnpm dev` imports the extension into Raycast with hot reload.
+The prerequisites are the ones under Install. To work on the extension, run `pnpm install` and then `pnpm dev`. `pnpm dev` imports the extension into Raycast with hot reload, and rebuilds it on every change until you stop it.
 
 ## Build, test and lint
 
@@ -78,7 +71,7 @@ Raycast-bound:
 - `src/storage.ts` keeps the two lists and the last tiling in Raycast local storage.
 - Each command in `package.json` has one entry file at `src/<command-name>.tsx`. `src/manage-lists.tsx` is the only view command.
 
-`package.json` is the single source for the command list, preferences and arguments. `src/manifest.integration.test.ts` checks that its options match the code constants (`LAYOUT_IDS`, `ORDER_IDS`, `GAP_UNITS`, `REORDER_ACTIONS`), that every layout has both dedicated commands, that the disabled-by-default set is exactly the dedicated tile and move commands, and that every command has an entry file.
+`package.json` is the single source for the command list, preferences and arguments. `src/manifest.integration.test.ts` checks that its options match the code constants (`LAYOUT_IDS`, `ORDER_IDS`, `GAP_UNITS`, `GRID_BALANCES`, `REORDER_ACTIONS`), that every layout has both dedicated commands, that the disabled-by-default set is exactly the dedicated tile and move commands, and that every command has an entry file.
 
 ## Conventions
 
