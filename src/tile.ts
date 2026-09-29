@@ -14,11 +14,12 @@ import {
   type LayoutId,
   type Rect,
 } from "./layouts";
-import { isOrderId, orderBySlot } from "./ordering";
-import { loadLists } from "./storage";
+import { isOrderId, orderBySlot, type OrderId } from "./ordering";
+import { rotate, swapActive } from "./reorder";
+import type { Scope } from "./scope";
+import { loadLastTiling, loadLists, saveLastTiling } from "./storage";
 
-/** Which windows a tiling command arranges. */
-export type Scope = "current-app" | "desktop";
+export type { Scope } from "./scope";
 
 type Window = WindowManagement.Window;
 
@@ -69,10 +70,23 @@ async function windowsInScope(scope: Scope): Promise<Window[]> {
   return windows.filter((window) => window.application?.bundleId === bundleId);
 }
 
-async function tileWindows(
-  scope: Scope,
-  layoutOverride: LayoutId | undefined,
-): Promise<void> {
+/** Rearranges windows already in slot order; `undefined` means this group has nothing to rearrange. */
+type Rearrange = (ordered: PlacedWindow[]) => PlacedWindow[] | undefined;
+
+type TileRequest = {
+  scope: Scope;
+  /** Overrides the layout preference. */
+  layout: LayoutId | undefined;
+  /** Overrides the window order preference. */
+  order: OrderId | undefined;
+  /** Applied to each desktop's windows after ordering, to reorder windows within the layout. */
+  rearrange: Rearrange | undefined;
+  /** Past-tense verb for the result toast. */
+  verb: string;
+};
+
+async function tileWindows(request: TileRequest): Promise<void> {
+  const { scope, rearrange, verb } = request;
   const {
     layout: preferredLayout,
     windowOrder,
@@ -83,10 +97,10 @@ async function tileWindows(
     moveDuration: rawMoveDuration,
     resizeDuration: rawResizeDuration,
   } = getPreferenceValues<Preferences>();
-  const layout = layoutOverride ?? preferredLayout;
+  const layout = request.layout ?? preferredLayout;
   if (!isLayoutId(layout)) throw new Error(`Unknown layout "${layout}"`);
-  if (!isOrderId(windowOrder))
-    throw new Error(`Unknown window order "${windowOrder}"`);
+  const order = request.order ?? windowOrder;
+  if (!isOrderId(order)) throw new Error(`Unknown window order "${order}"`);
   if (!isGapUnit(gapUnit)) throw new Error(`Unknown gap unit "${gapUnit}"`);
   const gap = {
     value: parseNumber("Gap", rawGap),
@@ -128,8 +142,8 @@ async function tileWindows(
       height: desktop.size.height,
     };
     const rects = layoutWindows(layout, windows.length, area, gap);
-    const bySlot = orderBySlot(
-      windowOrder,
+    const ordered = orderBySlot(
+      order,
       windows,
       rects,
       {
@@ -139,6 +153,8 @@ async function tileWindows(
       },
       lists.include,
     );
+    const bySlot = rearrange === undefined ? ordered : rearrange(ordered);
+    if (bySlot === undefined) return [];
     return bySlot.map((window, index) => {
       const rect = rects[index];
       if (rect === undefined)
@@ -150,10 +166,14 @@ async function tileWindows(
   if (moves.length === 0) {
     await showToast({
       style: Toast.Style.Failure,
-      title: "No windows to tile",
+      title:
+        rearrange === undefined
+          ? "No windows to tile"
+          : "The focused window is not among the tiled windows",
     });
     return;
   }
+  if (rearrange === undefined) await saveLastTiling({ scope, layout });
 
   const failures = await animateMoves(
     moves.map((move) => ({
@@ -177,7 +197,7 @@ async function tileWindows(
   if (failures.size === 0 && skipped === 0) {
     await showToast({
       style: Toast.Style.Success,
-      title: `Tiled ${tiled} ${tiled === 1 ? "window" : "windows"}`,
+      title: `${verb} ${tiled} ${tiled === 1 ? "window" : "windows"}`,
     });
     return;
   }
@@ -187,7 +207,7 @@ async function tileWindows(
   ].filter((note) => note !== undefined);
   await showToast({
     style: Toast.Style.Failure,
-    title: `Tiled ${tiled} of ${moves.length + skipped} windows`,
+    title: `${verb} ${tiled} of ${moves.length + skipped} windows`,
     message: notes.join("; "),
   });
 }
@@ -199,8 +219,46 @@ async function tileWindows(
  */
 export async function runTile(scope: Scope, layout?: LayoutId): Promise<void> {
   try {
-    await tileWindows(scope, layout);
+    await tileWindows({
+      scope,
+      layout,
+      order: undefined,
+      rearrange: undefined,
+      verb: "Tiled",
+    });
   } catch (error) {
     await showFailureToast(error, { title: "Could not tile windows" });
+  }
+}
+
+/** A change to the order of the windows in the current layout. */
+export type ReorderAction =
+  "move-forward" | "move-back" | "rotate-forward" | "rotate-back";
+
+const REARRANGE: Record<ReorderAction, Rearrange> = {
+  "move-forward": (ordered) =>
+    swapActive(ordered, (window) => window.active, 1),
+  "move-back": (ordered) => swapActive(ordered, (window) => window.active, -1),
+  "rotate-forward": (ordered) => rotate(ordered, 1),
+  "rotate-back": (ordered) => rotate(ordered, -1),
+};
+
+/**
+ * Reorders the windows within the layout the last tiling command used, reporting any error as a failure toast.
+ *
+ * Windows are first matched to slots by where they are now, so this acts on the arrangement on screen. With no earlier tiling it uses the desktop scope and the layout preference.
+ */
+export async function runReorder(action: ReorderAction): Promise<void> {
+  try {
+    const last = await loadLastTiling();
+    await tileWindows({
+      scope: last?.scope ?? "desktop",
+      layout: last?.layout,
+      order: "nearest",
+      rearrange: REARRANGE[action],
+      verb: "Reordered",
+    });
+  } catch (error) {
+    await showFailureToast(error, { title: "Could not reorder windows" });
   }
 }

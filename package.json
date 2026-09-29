@@ -163,6 +163,50 @@
         "arrange",
         "layout"
       ]
+    },
+    {
+      "name": "move-window-forward",
+      "title": "Move Window Forward",
+      "description": "Swap the focused window with the next one in the current layout.",
+      "mode": "no-view",
+      "keywords": [
+        "swap",
+        "next",
+        "order"
+      ]
+    },
+    {
+      "name": "move-window-back",
+      "title": "Move Window Back",
+      "description": "Swap the focused window with the previous one in the current layout.",
+      "mode": "no-view",
+      "keywords": [
+        "swap",
+        "previous",
+        "order"
+      ]
+    },
+    {
+      "name": "rotate-windows-forward",
+      "title": "Rotate Windows Forward",
+      "description": "Move every window one slot forward in the current layout, the last to the first.",
+      "mode": "no-view",
+      "keywords": [
+        "cycle",
+        "next",
+        "order"
+      ]
+    },
+    {
+      "name": "rotate-windows-back",
+      "title": "Rotate Windows Back",
+      "description": "Move every window one slot back in the current layout, the first to the last.",
+      "mode": "no-view",
+      "keywords": [
+        "cycle",
+        "previous",
+        "order"
+      ]
     }
   ],
   "preferences": [

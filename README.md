@@ -7,6 +7,7 @@ Raycast extension that tiles windows into a chosen layout, with include and excl
 - **Tile Windows** tiles every window on the active desktop in the layout chosen in preferences.
 - **Tile App** tiles every window of the frontmost application in the layout chosen in preferences.
 - **Tile Windows: Layout** and **Tile App: Layout**, one pair per layout, ignore the layout preference and always use their own layout.
+- **Move Window Forward** and **Move Window Back** swap the focused window with the next or previous one in the layout on screen; **Rotate Windows Forward** and **Rotate Windows Back** shift every window one slot. They use the layout and scope of the last tiling command, match windows to slots by where they are now, and wrap around at the ends.
 - **Tiling Lists** adds applications to the exclude list (never tiled) or the include list (when non-empty, only these are tiled). Exclude wins over include. Applications are matched by bundle ID.
 
 ## Layouts
