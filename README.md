@@ -10,7 +10,7 @@ Raycast extension that tiles windows into a chosen layout, with include and excl
 
 ## Layouts
 
-Grid, columns, rows, main and stack, spiral. The active window is placed first, so it takes the main slot in main and stack and the first slot in the spiral. Layout and gap are extension preferences.
+Grid, columns, rows, main and stack, spiral. Each window goes to the layout slot nearest where it already is, chosen so the total distance moved is minimal, so windows keep roughly their current arrangement. Fullscreen windows are skipped. Layout and gap are extension preferences.
 
 ## Requirements
 

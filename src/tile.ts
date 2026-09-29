@@ -7,6 +7,7 @@ import {
 import { showFailureToast } from "@raycast/utils";
 import { isAllowed } from "./filter";
 import { isLayoutId, layoutWindows } from "./layouts";
+import { assignToNearestSlots } from "./proximity";
 import { loadLists } from "./storage";
 
 /** Which windows a tiling command arranges. */
@@ -22,12 +23,18 @@ function parseGap(raw: string | undefined): number {
   return gap;
 }
 
-/** Puts the active window first so order-sensitive layouts (main-stack, spiral) give it the largest slot. */
-function activeFirst(windows: Window[]): Window[] {
-  return [
-    ...windows.filter((window) => window.active),
-    ...windows.filter((window) => !window.active),
-  ];
+type PlacedWindow = Window & {
+  bounds: Exclude<Window["bounds"], "fullscreen">;
+};
+
+/** A fullscreen window has no position to tile from, and resizing it would take it out of fullscreen. */
+function isPlaced(window: Window): window is PlacedWindow {
+  return window.bounds !== "fullscreen";
+}
+
+function centreOf(window: PlacedWindow): { x: number; y: number } {
+  const { position, size } = window.bounds;
+  return { x: position.x + size.width / 2, y: position.y + size.height / 2 };
 }
 
 async function windowsInScope(scope: Scope): Promise<Window[]> {
@@ -57,14 +64,12 @@ async function tileWindows(scope: Scope): Promise<void> {
     isAllowed(window.application?.bundleId, lists),
   );
   const tileable = allowed.filter(
-    (window) => window.positionable && window.resizable,
+    (window): window is PlacedWindow =>
+      window.positionable && window.resizable && isPlaced(window),
   );
   const skipped = allowed.length - tileable.length;
 
-  const byDesktop = Map.groupBy(
-    activeFirst(tileable),
-    (window) => window.desktopId,
-  );
+  const byDesktop = Map.groupBy(tileable, (window) => window.desktopId);
   const moves = [...byDesktop].flatMap(([desktopId, windows]) => {
     const desktop = desktops.find((candidate) => candidate.id === desktopId);
     if (desktop === undefined)
@@ -77,14 +82,14 @@ async function tileWindows(scope: Scope): Promise<void> {
       width: desktop.size.width,
       height: desktop.size.height,
     };
-    return layoutWindows(layout, windows.length, area, gap).map(
-      (rect, index) => {
-        const window = windows[index];
-        if (window === undefined)
-          throw new Error("Layout returned more rectangles than windows");
-        return { window, desktopId, rect };
-      },
-    );
+    const rects = layoutWindows(layout, windows.length, area, gap);
+    const bySlot = assignToNearestSlots(windows, centreOf, rects);
+    return bySlot.map((window, index) => {
+      const rect = rects[index];
+      if (rect === undefined)
+        throw new Error("Layout returned fewer rectangles than windows");
+      return { window, desktopId, rect };
+    });
   });
 
   if (moves.length === 0) {
