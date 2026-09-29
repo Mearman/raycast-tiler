@@ -1,3 +1,12 @@
+## [1.2.1](https://github.com/Mearman/raycast-tiler/compare/v1.2.0...v1.2.1) (2026-09-29)
+
+### Documentation
+
+* add install instructions ([917779e](https://github.com/Mearman/raycast-tiler/commit/917779edf77f480f6060bbf96f7533927128ed41))
+* drop the Raycast Pro requirement and the unverified permission step ([6c0215b](https://github.com/Mearman/raycast-tiler/commit/6c0215b67b558de4d2f23f023843639ce063abfd))
+* install with Import Extension and a build, without a dev server ([0d40a4c](https://github.com/Mearman/raycast-tiler/commit/0d40a4c68a2e7560aea316485f79695763b8b03e))
+* list every checked constant and merge the prerequisites into Install ([50bee72](https://github.com/Mearman/raycast-tiler/commit/50bee728baaafee409c3e66d9915aa29715905bd))
+
 ## [1.2.0](https://github.com/Mearman/raycast-tiler/compare/v1.1.0...v1.2.0) (2026-09-29)
 
 ### Features
