@@ -187,6 +187,27 @@
       ]
     },
     {
+      "name": "move-window-start",
+      "title": "Move Window to Start",
+      "description": "Move the focused window to the first slot in the current layout, shifting the others along.",
+      "mode": "no-view",
+      "keywords": [
+        "first",
+        "beginning",
+        "order"
+      ]
+    },
+    {
+      "name": "move-window-end",
+      "title": "Move Window to End",
+      "description": "Move the focused window to the last slot in the current layout, shifting the others back.",
+      "mode": "no-view",
+      "keywords": [
+        "last",
+        "order"
+      ]
+    },
+    {
       "name": "rotate-windows-forward",
       "title": "Rotate Windows Forward",
       "description": "Move every window one slot forward in the current layout, the last to the first.",

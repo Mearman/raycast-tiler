@@ -15,7 +15,7 @@ import {
   type Rect,
 } from "./layouts";
 import { isOrderId, orderBySlot, type OrderId } from "./ordering";
-import { rotate, swapActive } from "./reorder";
+import { moveActiveTo, rotate, swapActive } from "./reorder";
 import type { Scope } from "./scope";
 import { loadLastTiling, loadLists, saveLastTiling } from "./storage";
 
@@ -244,11 +244,19 @@ export async function runTile(scope: Scope, layout?: LayoutId): Promise<void> {
 
 /** A change to the order of the windows in the current layout. */
 export type ReorderAction =
-  "move-forward" | "move-back" | "rotate-forward" | "rotate-back";
+  | "move-forward"
+  | "move-back"
+  | "move-start"
+  | "move-end"
+  | "rotate-forward"
+  | "rotate-back";
 
 const REARRANGE: Record<ReorderAction, Rearrange> = {
   "move-forward": (ordered, isFocused) => swapActive(ordered, isFocused, 1),
   "move-back": (ordered, isFocused) => swapActive(ordered, isFocused, -1),
+  "move-start": (ordered, isFocused) =>
+    moveActiveTo(ordered, isFocused, "start"),
+  "move-end": (ordered, isFocused) => moveActiveTo(ordered, isFocused, "end"),
   "rotate-forward": (ordered) => rotate(ordered, 1),
   "rotate-back": (ordered) => rotate(ordered, -1),
 };

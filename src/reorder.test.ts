@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { rotate, swapActive } from "./reorder";
+import { moveActiveTo, rotate, swapActive } from "./reorder";
 
 describe("swapActive", () => {
   const isB = (item: string) => item === "b";
@@ -52,5 +52,40 @@ describe("rotate", () => {
   it("is the identity for a full turn and for nothing to rotate", () => {
     expect(rotate(["a", "b", "c"], 3)).toEqual(["a", "b", "c"]);
     expect(rotate([], 1)).toEqual([]);
+  });
+});
+
+describe("moveActiveTo", () => {
+  const isC = (item: string) => item === "c";
+
+  it("moves the active item to the start, shifting the others along", () => {
+    expect(moveActiveTo(["a", "b", "c", "d"], isC, "start")).toEqual([
+      "c",
+      "a",
+      "b",
+      "d",
+    ]);
+  });
+
+  it("moves the active item to the end, shifting the others back", () => {
+    expect(moveActiveTo(["a", "b", "c", "d"], isC, "end")).toEqual([
+      "a",
+      "b",
+      "d",
+      "c",
+    ]);
+  });
+
+  it("leaves an item already at the edge in place", () => {
+    expect(moveActiveTo(["c", "a", "b"], isC, "start")).toEqual([
+      "c",
+      "a",
+      "b",
+    ]);
+    expect(moveActiveTo(["a", "b", "c"], isC, "end")).toEqual(["a", "b", "c"]);
+  });
+
+  it("returns undefined when nothing is active", () => {
+    expect(moveActiveTo(["a", "b"], () => false, "start")).toBeUndefined();
   });
 });

@@ -33,3 +33,19 @@ export function rotate<T>(items: readonly T[], offset: number): T[] {
     return item;
   });
 }
+
+/**
+ * Moves the active item to the start or end, shifting the items in between along by one.
+ *
+ * Returns a new array, or `undefined` when no item is active.
+ */
+export function moveActiveTo<T>(
+  items: readonly T[],
+  isActive: (item: T) => boolean,
+  edge: "start" | "end",
+): T[] | undefined {
+  const active = items.find(isActive);
+  if (active === undefined) return undefined;
+  const others = items.filter((item) => item !== active);
+  return edge === "start" ? [active, ...others] : [...others, active];
+}
