@@ -24,8 +24,6 @@ if (!isManifest(parsed)) throw new Error("package.json is not a manifest");
 const manifest = parsed;
 
 const SCOPES = ["desktop", "current-app"] as const;
-const DEFAULT_COMMANDS = ["tile-desktop", "tile-current-app", "manage-lists"];
-
 describe("manifest", () => {
   it("offers every layout in the layout preference", () => {
     const layout = manifest.preferences.find((pref) => pref.name === "layout");
@@ -35,20 +33,18 @@ describe("manifest", () => {
   });
 
   it.each(SCOPES.flatMap((scope) => LAYOUT_IDS.map((id) => [scope, id])))(
-    "registers a disabled-by-default %s command for the %s layout",
+    "registers a %s command for the %s layout",
     (scope, id) => {
-      const command = manifest.commands.find(
-        (candidate) => candidate.name === `tile-${scope}-${id}`,
+      expect(manifest.commands.map((command) => command.name)).toContain(
+        `tile-${scope}-${id}`,
       );
-      expect(command?.disabledByDefault).toBe(true);
     },
   );
 
-  it("leaves only the default commands enabled by default", () => {
-    const enabled = manifest.commands
-      .filter((command) => command.disabledByDefault !== true)
-      .map((command) => command.name);
-    expect(enabled.sort()).toEqual([...DEFAULT_COMMANDS].sort());
+  it("enables every command by default", () => {
+    expect(
+      manifest.commands.filter((command) => command.disabledByDefault),
+    ).toEqual([]);
   });
 
   it("has an entry file for every command", () => {

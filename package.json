@@ -36,71 +36,61 @@
       "name": "tile-desktop-grid",
       "title": "Tile Desktop Windows (Grid)",
       "description": "Tile every window on the active desktop in the Grid layout, ignoring the layout preference.",
-      "mode": "no-view",
-      "disabledByDefault": true
+      "mode": "no-view"
     },
     {
       "name": "tile-desktop-columns",
       "title": "Tile Desktop Windows (Columns)",
       "description": "Tile every window on the active desktop in the Columns layout, ignoring the layout preference.",
-      "mode": "no-view",
-      "disabledByDefault": true
+      "mode": "no-view"
     },
     {
       "name": "tile-desktop-rows",
       "title": "Tile Desktop Windows (Rows)",
       "description": "Tile every window on the active desktop in the Rows layout, ignoring the layout preference.",
-      "mode": "no-view",
-      "disabledByDefault": true
+      "mode": "no-view"
     },
     {
       "name": "tile-desktop-main-stack",
       "title": "Tile Desktop Windows (Main and Stack)",
       "description": "Tile every window on the active desktop in the Main and Stack layout, ignoring the layout preference.",
-      "mode": "no-view",
-      "disabledByDefault": true
+      "mode": "no-view"
     },
     {
       "name": "tile-desktop-spiral",
       "title": "Tile Desktop Windows (Spiral)",
       "description": "Tile every window on the active desktop in the Spiral layout, ignoring the layout preference.",
-      "mode": "no-view",
-      "disabledByDefault": true
+      "mode": "no-view"
     },
     {
       "name": "tile-current-app-grid",
       "title": "Tile Current App Windows (Grid)",
       "description": "Tile every window of the frontmost application in the Grid layout, ignoring the layout preference.",
-      "mode": "no-view",
-      "disabledByDefault": true
+      "mode": "no-view"
     },
     {
       "name": "tile-current-app-columns",
       "title": "Tile Current App Windows (Columns)",
       "description": "Tile every window of the frontmost application in the Columns layout, ignoring the layout preference.",
-      "mode": "no-view",
-      "disabledByDefault": true
+      "mode": "no-view"
     },
     {
       "name": "tile-current-app-rows",
       "title": "Tile Current App Windows (Rows)",
       "description": "Tile every window of the frontmost application in the Rows layout, ignoring the layout preference.",
-      "mode": "no-view",
-      "disabledByDefault": true
+      "mode": "no-view"
     },
     {
       "name": "tile-current-app-main-stack",
       "title": "Tile Current App Windows (Main and Stack)",
       "description": "Tile every window of the frontmost application in the Main and Stack layout, ignoring the layout preference.",
-      "mode": "no-view",
-      "disabledByDefault": true
+      "mode": "no-view"
     },
     {
       "name": "tile-current-app-spiral",
       "title": "Tile Current App Windows (Spiral)",
       "description": "Tile every window of the frontmost application in the Spiral layout, ignoring the layout preference.",
-      "mode": "no-view",
-      "disabledByDefault": true
+      "mode": "no-view"
     }
   ],
   "preferences": [

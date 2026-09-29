@@ -6,7 +6,7 @@ Raycast extension that tiles windows into a chosen layout, with include and excl
 
 - **Tile Current App Windows** tiles every window of the frontmost application.
 - **Tile Desktop Windows** tiles every window on the active desktop.
-- **Tile Desktop Windows (Layout)** and **Tile Current App Windows (Layout)**, one pair per layout, ignore the layout preference and always use their own layout. They are disabled by default so only the two commands above appear in root search; enable the ones you want in Raycast's extension preferences. The manifest cannot vary by build, so development imports disable them too on first install and new commands are disabled the first time they appear.
+- **Tile Desktop Windows (Layout)** and **Tile Current App Windows (Layout)**, one pair per layout, ignore the layout preference and always use their own layout.
 - **Manage Tiling Lists** adds applications to the exclude list (never tiled) or the include list (when non-empty, only these are tiled). Exclude wins over include. Applications are matched by bundle ID.
 
 ## Layouts
