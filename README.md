@@ -32,14 +32,16 @@ pnpm dev
 
 ## Build, test and lint
 
-- `pnpm build` runs `ray build`.
-- `pnpm test` runs the whole Vitest suite. Run one file with `pnpm exec vitest run src/proximity.unit.test.ts`. Run one test with `-t "part of the test name"`.
+Each public script runs a Turborepo task of the same name with an underscore prefix, so `pnpm lint` runs the `_lint` task, which runs the `_lint` script. `turbo.json` declares each task's inputs, outputs and dependencies. Turborepo caches the results, so a repeat run with unchanged inputs replays the output.
+
+- `pnpm build` runs `ray build`. It also writes `raycast-env.d.ts`, which types the preferences and command arguments. Git ignores that file. Lint, typecheck and mutation depend on the build task, so they generate the file themselves, and the cache restores it when it is missing.
+- `pnpm test` runs the whole Vitest suite. Run one file with `pnpm exec vitest run src/proximity.unit.test.ts`. Run one test with `-t "part of the test name"`. These direct calls skip Turborepo.
 - `pnpm test:coverage` runs the suite with V8 coverage.
-- `pnpm lint` generates the types, then runs ESLint with no warnings allowed. ESLint includes Prettier and the Raycast rules. Fix formatting and auto-fixable problems with `pnpm exec eslint . --fix`.
+- `pnpm lint` runs ESLint with no warnings allowed. ESLint includes Prettier and the Raycast rules. Fix formatting and auto-fixable problems with `pnpm exec eslint . --fix`.
 - `pnpm lint:raycast` runs `ray lint`, which adds the manifest and icon checks. In CI it also demands a `package-lock.json`, which the Raycast store needs and this pnpm project does not have, so CI does not run it.
-- `pnpm typecheck` generates the types, then runs `tsc --noEmit`.
-- `pnpm generate-types` runs `ray build`, which writes `raycast-env.d.ts`. That file types the preferences and command arguments, and git ignores it. Run this script once after a clone, because lint-staged and editors need the file. `pnpm lint`, `pnpm typecheck` and `pnpm mutation` run it themselves.
-- `pnpm mutation` generates the types, then runs Stryker on the pure logic modules with the Vitest runner and the TypeScript checker. It reads `stryker.config.ts`.
+- `pnpm typecheck` runs `tsc --noEmit`.
+- `pnpm mutation` runs Stryker on the pure logic modules with the Vitest runner and the TypeScript checker. It reads `stryker.config.ts`. Pass Stryker options after `--`, for example `pnpm mutation -- --dryRunOnly`.
+- `pnpm prepush` runs the type check, the lint and the tests in one Turborepo run. The pre-push hook calls it.
 
 ## Architecture
 
@@ -70,7 +72,7 @@ Raycast-bound:
 - Test files must say their kind: `*.unit.test.ts` or `*.integration.test.ts`.
 - To add a layout, window order, gap unit or reorder action, add its id to the code constant, its option to `package.json`, and tests. The manifest test fails until all three agree. A new command needs a manifest entry and its `src/<command-name>.tsx` file.
 - Command titles must be in Raycast title case. `ray lint` treats "up" as a particle and rejects "Move Window Up", which is why the direction commands end in "ward".
-- Configuration files are TypeScript (`eslint.config.ts`, `prettier.config.ts`, `commitlint.config.ts`, `lint-staged.config.ts`, `vitest.config.ts`, `stryker.config.ts`). `package.json` sets `"type": "module"` for them.
+- Configuration files are TypeScript (`eslint.config.ts`, `prettier.config.ts`, `commitlint.config.ts`, `lint-staged.config.ts`, `vitest.config.ts`, `stryker.config.ts`). `turbo.json` declares the task graph. `package.json` sets `"type": "module"` for them.
 - Write comments in British English.
 
 ## Non-obvious behaviour
@@ -89,7 +91,7 @@ Raycast-bound:
 
 ## Contributing
 
-Use conventional commits with a subject of at most 100 characters. `release.config.ts` lists the allowed types, and commitlint, the release rules and the changelog sections all read that list. Every type triggers a release: `feat` a minor one and every other type a patch. A breaking change triggers a major one. Commitlint checks the commit at commit time and again in CI. The pre-commit hook runs `eslint --fix` on staged TypeScript files through lint-staged. The pre-push hook runs the type check, the lint and the tests. The default branch is `main`.
+Use conventional commits with a subject of at most 100 characters. `release.config.ts` lists the allowed types, and commitlint, the release rules and the changelog sections all read that list. Every type triggers a release: `feat` a minor one and every other type a patch. A breaking change triggers a major one. Commitlint checks the commit at commit time and again in CI. The pre-commit hook runs `eslint --fix` on staged TypeScript files through lint-staged. The pre-push hook runs `pnpm prepush`. The default branch is `main`.
 
 Every push to `main` runs the checks, then semantic-release. It bumps the version, writes `CHANGELOG.md`, tags the release, creates the GitHub Release, and commits the changelog and `package.json`. A separate job then publishes the package to GitHub Packages as the scoped alias `@mearman/raycast-tiler`, because GitHub Packages requires a name scoped to the repository owner. That job renames the package at publish time, so `package.json` keeps the Raycast extension name. Publishing to the Raycast store is a separate manual step.
 
