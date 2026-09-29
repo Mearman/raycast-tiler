@@ -1,29 +1,95 @@
 # Window Tiler
 
-Raycast extension that tiles windows into a chosen layout, with include and exclude lists for applications.
+Raycast extension that tiles macOS windows into a layout, with include and exclude lists for applications. Stack: TypeScript, React, the Raycast API, pnpm, Vitest.
 
 ## Commands
 
-- **Tile Windows** tiles every window on the active desktop and **Tile App** tiles every window of the frontmost application. Both use the layout preference unless the optional Layout argument names one. **Tile Windows: Layout** and **Tile App: Layout**, one pair per layout, use their own layout with no argument, which suits hotkeys and aliases since those cannot carry an argument. They are disabled by default so root search stays short; enable the ones you want in Raycast's extension preferences.
-- **Move Window Forward** and **Move Window Back** swap the focused window with the next or previous one in the layout on screen; **Move Window to Start** and **Move Window to End** put it in the first or last slot and shift the windows in between; **Move Window Leftward**, **Rightward**, **Upward** and **Downward** swap it with the window next to it in that direction on screen (an error when there is none); **Move Window** takes any of these, or an order change, as a required argument. The dedicated move commands are disabled by default so root search stays short; enable the ones you want in Raycast's extension preferences, or use Move Window; **Rotate Windows Forward** and **Rotate Windows Back** shift every window one slot. They use the layout and scope of the last tiling command, match windows to slots by where they are now, and wrap around at the ends.
-- **Tiling Lists** adds applications to the exclude list (never tiled) or the include list (when non-empty, only these are tiled). Exclude wins over include. Applications are matched by bundle ID.
+- **Tile Windows** tiles every window on the active desktop. **Tile App** tiles every window of the frontmost application. Both use the Layout preference. An optional Layout argument overrides it.
+- **Tile Windows: Layout** and **Tile App: Layout** exist for each layout. Each uses its own layout and takes no argument, so a hotkey or alias can target one layout (Raycast hotkeys cannot carry an argument). They are disabled by default.
+- **Move Window Forward**, **Back**, **to Start**, **to End**, **Leftward**, **Rightward**, **Upward** and **Downward** change the position of the focused window in the current layout. Forward and Back swap it with the next or previous slot. To Start and To End put it in the first or last slot and shift the windows between. The four directions swap it with the window next to it on screen, and fail with an error when there is none. These commands are disabled by default.
+- **Move Window** does the same and takes the change as a required argument: any of the eight above, or a rotation.
+- **Rotate Windows Forward** and **Rotate Windows Back** move every window one slot along and wrap at the ends.
+- **Tiling Lists** edits two lists of applications, matched by bundle ID. Applications on the exclude list are never tiled. When the include list is not empty, only its applications are tiled. Exclude wins over include. The order of the include list is the priority order for the App Priority window order, and Move Up and Move Down change it.
 
-## Layouts
+Reorder commands use the layout and scope of the last tiling command. They match windows to slots by current position, whatever the Window Order preference says.
 
-Grid, columns, rows, main and stack, spiral. Which window goes in which layout slot is the Window Order preference: nearest slot (the default; each window goes to the slot closest to where it is, so total movement is minimal), reading order (top to bottom, then left to right), active first (the focused window takes the first slot, which is the main slot in main and stack), or app priority (windows sort by their application's position in the include list, reorderable in Tiling Lists, with ties in reading order; with an empty include list it is reading order). Fullscreen windows are skipped. Windows slide into position over the move duration and change size over the resize duration, each eased independently and each instant at 0; the animation lasts as long as the longer of the two. Frames are paced by the clock, so a slow window API drops frames rather than stretching the animation. The gap between windows and around the screen edge is set by the gap and gap unit preferences: points, percent of each window (of its own width and height) or percent of the screen (of its width and height). Two checkboxes choose where the gap applies: at the screen edge, between windows, or both (the default); with both off windows are flush. A negative gap makes neighbouring windows overlap by that amount; the screen edge is never pushed outwards, and a gap too large to leave every window a positive size is an error. Layout, window order, gap, gap unit, move duration and resize duration are extension preferences.
+Extension preferences: Layout (grid, columns, rows, main and stack, spiral), Window Order, Gap, Gap Unit, two Gap Placement checkboxes, Move Duration and Resize Duration.
 
-## Requirements
+- **Window Order** decides which window goes in which slot. Nearest slot (default) minimises total movement. Reading order goes top to bottom, then left to right. Active first puts the focused window in the first slot. App priority follows the include list, with ties in reading order.
+- **Gap** is the space between windows and around the screen edge. Gap Unit selects points, percent of each window, or percent of the screen. Percentages apply per axis. The two checkboxes select the screen edge, the space between windows, or both. A negative gap makes neighbouring windows overlap. It never pushes a window past the screen edge. A gap that leaves a window with no width or height is an error.
+- **Move Duration** and **Resize Duration** are in milliseconds. Windows slide and resize into place, each part eased on its own. A value of 0 makes that part instant.
 
-The Raycast window management API requires Raycast Pro and macOS. Windows that cannot be moved or resized are skipped and reported.
+## Getting started
 
-## Development
+Prerequisites: macOS, Raycast with a Pro subscription (the window management API requires it), Node, and pnpm. Windows is not supported by that API. The extension needs no environment variables.
 
 ```bash
 pnpm install
 pnpm dev
-pnpm test
-pnpm lint
-pnpm typecheck
 ```
 
-`typecheck` runs `ray build` first because `raycast-env.d.ts`, which types the preferences, is generated by it and not committed.
+`pnpm dev` imports the extension into Raycast with hot reload.
+
+## Build, test and lint
+
+- `pnpm build` runs `ray build`.
+- `pnpm test` runs the whole Vitest suite. Run one file with `pnpm exec vitest run src/proximity.unit.test.ts`. Run one test with `-t "part of the test name"`.
+- `pnpm test:coverage` runs the suite with V8 coverage.
+- `pnpm lint` runs `ray lint`: manifest checks, ESLint and Prettier. Fix formatting with `pnpm exec ray lint --fix`. Run ESLint alone with `pnpm exec eslint . --max-warnings 0`.
+- `pnpm typecheck` runs `ray build` first, then `tsc --noEmit`. The build generates `raycast-env.d.ts`, which types the preferences and command arguments. Git ignores that file.
+- `pnpm mutation` runs Stryker on the pure logic modules. It uses the command runner and reads `stryker.config.ts`.
+
+## Architecture
+
+The code has two halves. Pure logic never imports the Raycast API, so Vitest can test it directly. The Raycast-bound half reads preferences and windows and moves them.
+
+Pure logic:
+
+- `src/layouts/` holds one module per layout. A layout is a function from a window count and an area to one rectangle per window. `layout-windows.ts` applies the gap to those rectangles. `gap.ts` defines the gap and its units.
+- `src/proximity.ts` matches items to slots with the Hungarian algorithm.
+- `src/ordering.ts` implements the four window orders on top of it.
+- `src/reorder.ts` and `src/direction.ts` implement the reorder actions and the directional neighbour search.
+- `src/animation.ts` interpolates window rectangles over time, paced by the clock.
+- `src/filter.ts` implements the include and exclude lists.
+
+Raycast-bound:
+
+- `src/tile.ts` runs every tiling and reorder command. It reads preferences, gets the windows on the active desktop, applies the scope and the lists, drops windows that cannot be moved, groups them by desktop, computes the slots, orders the windows, applies any reorder, and animates the moves. `runTile` and `runReorder` are its entry points.
+- `src/storage.ts` keeps the two lists and the last tiling in Raycast local storage.
+- Each command in `package.json` has one entry file at `src/<command-name>.tsx`. `src/manage-lists.tsx` is the only view command.
+
+`package.json` is the single source for the command list, preferences and arguments. `src/manifest.integration.test.ts` checks that its options match the code constants (`LAYOUT_IDS`, `ORDER_IDS`, `GAP_UNITS`, `REORDER_ACTIONS`), that every layout has both dedicated commands, that the disabled-by-default set is exactly the dedicated tile and move commands, and that every command has an entry file.
+
+## Conventions
+
+- ESLint uses `@exadev/eslint-config`, the Raycast ESLint plugin and Prettier. Inline configuration is banned, so an `eslint-disable` comment fails the lint. Fix the code instead.
+- Barrel (index) files are banned. Import from the module that owns the symbol.
+- Every number except -1, 0, 1 and 2 needs a named constant. Function parameters that are arrays or plain objects must be `readonly` or `Readonly<...>`.
+- Test files must say their kind: `*.unit.test.ts` or `*.integration.test.ts`.
+- To add a layout, window order, gap unit or reorder action, add its id to the code constant, its option to `package.json`, and tests. The manifest test fails until all three agree. A new command needs a manifest entry and its `src/<command-name>.tsx` file.
+- Command titles must be in Raycast title case. `ray lint` treats "up" as a particle and rejects "Move Window Up", which is why the direction commands end in "ward".
+- Configuration files are TypeScript (`eslint.config.ts`, `prettier.config.ts`, `commitlint.config.ts`, `lint-staged.config.ts`, `vitest.config.ts`, `stryker.config.ts`). `package.json` sets `"type": "module"` for them.
+- Write comments in British English.
+
+## Non-obvious behaviour
+
+- `Window.active` is `true` for every window of the frontmost application, not only the focused one. Code that looks for "the active window" then picks the first window. Compare window ids with the result of `getActiveWindow()` instead, as `src/tile.ts` does.
+- A Raycast `Desktop` has a size but no position. Tiling places windows from the point (0, 0) of the desktop. This works on the main screen. It is not verified on a second screen.
+- Raycast cannot change the stacking order of windows. With a negative gap, the windows that end up on top are those that were already on top.
+- The API does not expose window titles. The extension cannot list or tell apart several windows of one application, so the reorder commands act on the focused window.
+- Fullscreen windows have no position to tile from and are skipped. Resizing one would take it out of fullscreen.
+- `disabledByDefault` only applies when Raycast first installs the extension or first sees a new command. An existing install keeps the enabled state it has. Change it in Raycast Settings, Extensions, or import the extension again.
+- Raycast preferences cannot hold a button, and the API cannot enable or disable commands.
+- `@stryker-mutator/vitest-runner` crashes on start with Vitest 5, so Stryker uses the command runner and re-runs the whole suite for every mutant. Run it as `stryker run stryker.config.ts`. Without the path, Stryker ignores the file and mutates everything.
+- TypeScript is pinned to version 6, because `typescript-eslint` does not support version 7.
+- The global pnpm setting `ignore-scripts=true` stops the `prepare` script, so `husky` does not install its own hooks path here. The machine-wide hook dispatcher runs the scripts in `.husky/` instead. `pnpm-workspace.yaml` marks the `esbuild` build script as not allowed.
+
+## Contributing
+
+Use conventional commits with a subject of at most 100 characters. Commitlint checks it at commit time. The pre-commit hook runs `eslint --fix` on staged TypeScript files through lint-staged. The pre-push hook runs the type check, the lint and the tests. The default branch is `main`.
+
+## References
+
+- Raycast window management API: https://developers.raycast.com/api-reference/window-management (archive: https://web.archive.org/web/https://developers.raycast.com/api-reference/window-management)
+- Raycast manifest, including `disabledByDefault` and arguments: https://developers.raycast.com/information/manifest (archive: https://web.archive.org/web/https://developers.raycast.com/information/manifest)
+- Shared lint rules: https://github.com/ExaDev/eslint-config
