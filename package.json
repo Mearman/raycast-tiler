@@ -16,81 +16,153 @@
   "commands": [
     {
       "name": "tile-current-app",
-      "title": "Tile Current App Windows",
-      "description": "Tile every window of the frontmost application.",
-      "mode": "no-view"
+      "title": "Tile App Windows",
+      "description": "Tile every window of the frontmost application in the layout chosen in preferences.",
+      "mode": "no-view",
+      "keywords": [
+        "current",
+        "application",
+        "arrange",
+        "layout"
+      ]
     },
     {
       "name": "tile-desktop",
-      "title": "Tile Desktop Windows",
-      "description": "Tile every window on the active desktop.",
-      "mode": "no-view"
+      "title": "Tile All Windows",
+      "description": "Tile every window on the active desktop in the layout chosen in preferences.",
+      "mode": "no-view",
+      "keywords": [
+        "desktop",
+        "screen",
+        "arrange",
+        "layout"
+      ]
     },
     {
       "name": "manage-lists",
-      "title": "Manage Tiling Lists",
-      "description": "Choose which applications are included in or excluded from tiling.",
+      "title": "Manage Tiling Include and Exclude Lists",
+      "description": "Choose which applications are always left alone and, optionally, which are the only ones tiled.",
       "mode": "view"
     },
     {
       "name": "tile-desktop-grid",
-      "title": "Tile Desktop Windows (Grid)",
-      "description": "Tile every window on the active desktop in the Grid layout, ignoring the layout preference.",
-      "mode": "no-view"
+      "title": "Tile All Windows as Grid",
+      "description": "Tile every window on the active desktop as Grid, whatever the layout preference says.",
+      "mode": "no-view",
+      "keywords": [
+        "desktop",
+        "screen",
+        "arrange",
+        "layout"
+      ]
     },
     {
       "name": "tile-desktop-columns",
-      "title": "Tile Desktop Windows (Columns)",
-      "description": "Tile every window on the active desktop in the Columns layout, ignoring the layout preference.",
-      "mode": "no-view"
+      "title": "Tile All Windows as Columns",
+      "description": "Tile every window on the active desktop as Columns, whatever the layout preference says.",
+      "mode": "no-view",
+      "keywords": [
+        "desktop",
+        "screen",
+        "arrange",
+        "layout"
+      ]
     },
     {
       "name": "tile-desktop-rows",
-      "title": "Tile Desktop Windows (Rows)",
-      "description": "Tile every window on the active desktop in the Rows layout, ignoring the layout preference.",
-      "mode": "no-view"
+      "title": "Tile All Windows as Rows",
+      "description": "Tile every window on the active desktop as Rows, whatever the layout preference says.",
+      "mode": "no-view",
+      "keywords": [
+        "desktop",
+        "screen",
+        "arrange",
+        "layout"
+      ]
     },
     {
       "name": "tile-desktop-main-stack",
-      "title": "Tile Desktop Windows (Main and Stack)",
-      "description": "Tile every window on the active desktop in the Main and Stack layout, ignoring the layout preference.",
-      "mode": "no-view"
+      "title": "Tile All Windows as Main and Stack",
+      "description": "Tile every window on the active desktop as Main and Stack, whatever the layout preference says.",
+      "mode": "no-view",
+      "keywords": [
+        "desktop",
+        "screen",
+        "arrange",
+        "layout"
+      ]
     },
     {
       "name": "tile-desktop-spiral",
-      "title": "Tile Desktop Windows (Spiral)",
-      "description": "Tile every window on the active desktop in the Spiral layout, ignoring the layout preference.",
-      "mode": "no-view"
+      "title": "Tile All Windows as Spiral",
+      "description": "Tile every window on the active desktop as Spiral, whatever the layout preference says.",
+      "mode": "no-view",
+      "keywords": [
+        "desktop",
+        "screen",
+        "arrange",
+        "layout"
+      ]
     },
     {
       "name": "tile-current-app-grid",
-      "title": "Tile Current App Windows (Grid)",
-      "description": "Tile every window of the frontmost application in the Grid layout, ignoring the layout preference.",
-      "mode": "no-view"
+      "title": "Tile App Windows as Grid",
+      "description": "Tile every window of the frontmost application as Grid, whatever the layout preference says.",
+      "mode": "no-view",
+      "keywords": [
+        "current",
+        "application",
+        "arrange",
+        "layout"
+      ]
     },
     {
       "name": "tile-current-app-columns",
-      "title": "Tile Current App Windows (Columns)",
-      "description": "Tile every window of the frontmost application in the Columns layout, ignoring the layout preference.",
-      "mode": "no-view"
+      "title": "Tile App Windows as Columns",
+      "description": "Tile every window of the frontmost application as Columns, whatever the layout preference says.",
+      "mode": "no-view",
+      "keywords": [
+        "current",
+        "application",
+        "arrange",
+        "layout"
+      ]
     },
     {
       "name": "tile-current-app-rows",
-      "title": "Tile Current App Windows (Rows)",
-      "description": "Tile every window of the frontmost application in the Rows layout, ignoring the layout preference.",
-      "mode": "no-view"
+      "title": "Tile App Windows as Rows",
+      "description": "Tile every window of the frontmost application as Rows, whatever the layout preference says.",
+      "mode": "no-view",
+      "keywords": [
+        "current",
+        "application",
+        "arrange",
+        "layout"
+      ]
     },
     {
       "name": "tile-current-app-main-stack",
-      "title": "Tile Current App Windows (Main and Stack)",
-      "description": "Tile every window of the frontmost application in the Main and Stack layout, ignoring the layout preference.",
-      "mode": "no-view"
+      "title": "Tile App Windows as Main and Stack",
+      "description": "Tile every window of the frontmost application as Main and Stack, whatever the layout preference says.",
+      "mode": "no-view",
+      "keywords": [
+        "current",
+        "application",
+        "arrange",
+        "layout"
+      ]
     },
     {
       "name": "tile-current-app-spiral",
-      "title": "Tile Current App Windows (Spiral)",
-      "description": "Tile every window of the frontmost application in the Spiral layout, ignoring the layout preference.",
-      "mode": "no-view"
+      "title": "Tile App Windows as Spiral",
+      "description": "Tile every window of the frontmost application as Spiral, whatever the layout preference says.",
+      "mode": "no-view",
+      "keywords": [
+        "current",
+        "application",
+        "arrange",
+        "layout"
+      ]
     }
   ],
   "preferences": [
