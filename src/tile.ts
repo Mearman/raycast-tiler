@@ -5,6 +5,7 @@ import {
   WindowManagement,
 } from "@raycast/api";
 import { showFailureToast } from "@raycast/utils";
+import { animateMoves } from "./animation";
 import { isAllowed } from "./filter";
 import { isLayoutId, layoutWindows } from "./layouts";
 import { assignToNearestSlots } from "./proximity";
@@ -15,12 +16,12 @@ export type Scope = "current-app" | "desktop";
 
 type Window = WindowManagement.Window;
 
-function parseGap(raw: string | undefined): number {
+function parseNonNegative(name: string, raw: string | undefined): number {
   if (raw === undefined || raw.trim() === "") return 0;
-  const gap = Number(raw);
-  if (!Number.isFinite(gap) || gap < 0)
-    throw new Error(`Gap must be a non-negative number, got "${raw}"`);
-  return gap;
+  const value = Number(raw);
+  if (!Number.isFinite(value) || value < 0)
+    throw new Error(`${name} must be a non-negative number, got "${raw}"`);
+  return value;
 }
 
 type PlacedWindow = Window & {
@@ -50,9 +51,14 @@ async function windowsInScope(scope: Scope): Promise<Window[]> {
 }
 
 async function tileWindows(scope: Scope): Promise<void> {
-  const { layout, gap: rawGap } = getPreferenceValues<Preferences>();
+  const {
+    layout,
+    gap: rawGap,
+    animationDuration: rawDuration,
+  } = getPreferenceValues<Preferences>();
   if (!isLayoutId(layout)) throw new Error(`Unknown layout "${layout}"`);
-  const gap = parseGap(rawGap);
+  const gap = parseNonNegative("Gap", rawGap);
+  const duration = parseNonNegative("Animation duration", rawDuration);
 
   const [lists, desktops, scoped] = await Promise.all([
     loadLists(),
@@ -100,8 +106,18 @@ async function tileWindows(scope: Scope): Promise<void> {
     return;
   }
 
-  const results = await Promise.allSettled(
-    moves.map(({ window, desktopId, rect }) =>
+  const failures = await animateMoves(
+    moves.map((move) => ({
+      subject: move,
+      from: {
+        x: move.window.bounds.position.x,
+        y: move.window.bounds.position.y,
+        width: move.window.bounds.size.width,
+        height: move.window.bounds.size.height,
+      },
+      to: move.rect,
+    })),
+    ({ window, desktopId }, rect) =>
       WindowManagement.setWindowBounds({
         id: window.id,
         desktopId,
@@ -110,14 +126,11 @@ async function tileWindows(scope: Scope): Promise<void> {
           size: { width: rect.width, height: rect.height },
         },
       }),
-    ),
+    duration,
   );
 
-  const failures = results.filter(
-    (result): result is PromiseRejectedResult => result.status === "rejected",
-  );
-  const tiled = moves.length - failures.length;
-  if (failures.length === 0 && skipped === 0) {
+  const tiled = moves.length - failures.size;
+  if (failures.size === 0 && skipped === 0) {
     await showToast({
       style: Toast.Style.Success,
       title: `Tiled ${tiled} ${tiled === 1 ? "window" : "windows"}`,
@@ -126,7 +139,7 @@ async function tileWindows(scope: Scope): Promise<void> {
   }
   const notes = [
     skipped > 0 ? `${skipped} could not be moved or resized` : undefined,
-    failures[0] === undefined ? undefined : String(failures[0].reason),
+    failures.size === 0 ? undefined : String([...failures.values()][0]),
   ].filter((note) => note !== undefined);
   await showToast({
     style: Toast.Style.Failure,

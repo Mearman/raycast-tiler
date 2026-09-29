@@ -72,6 +72,15 @@
       "required": false,
       "default": "0",
       "placeholder": "0"
+    },
+    {
+      "name": "animationDuration",
+      "title": "Animation Duration",
+      "description": "Milliseconds windows take to slide and resize into place. 0 moves them instantly. Must be a non-negative number.",
+      "type": "textfield",
+      "required": false,
+      "default": "200",
+      "placeholder": "200"
     }
   ],
   "scripts": {
