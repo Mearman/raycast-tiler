@@ -11,6 +11,7 @@ const config: PartialStrykerOptions = {
     "src/filter.ts",
     "src/ordering.ts",
     "src/proximity.ts",
+    "src/rects.ts",
     "src/reorder.ts",
   ],
   testRunner: "vitest",
