@@ -20,6 +20,7 @@ import {
   swapInDirection,
   type ReorderAction,
 } from "./reorder";
+import { rectsMatch } from "./rects";
 import type { Scope } from "./scope";
 import { loadLastTiling, loadLists, saveLastTiling } from "./storage";
 
@@ -216,8 +217,12 @@ async function tileWindows(request: Readonly<TileRequest>): Promise<void> {
   }
   if (rearrange === undefined) await saveLastTiling({ scope, layout });
 
+  // Windows already on their target are left alone, which also keeps them out of the sequential transition's time budget.
+  const outstanding = moves.filter(
+    (move) => !rectsMatch(rectOf(move.window), move.rect),
+  );
   const failures = await animateMoves(
-    moves.map((move) => ({
+    outstanding.map((move) => ({
       subject: move,
       from: rectOf(move.window),
       to: move.rect,
