@@ -1,6 +1,6 @@
 import { LocalStorage } from "@raycast/api";
 import { isAppLists, type AppLists } from "./filter";
-import { isLayoutId, type LayoutId } from "./layouts/types";
+import { isLayoutId, type LayoutId, type Rect } from "./layouts/types";
 import { isScope, type Scope } from "./scope";
 
 const KEY = "app-lists";
@@ -22,10 +22,27 @@ export async function saveLists(lists: AppLists): Promise<void> {
 
 const LAST_TILING_KEY = "last-tiling";
 
-/** What the most recent tiling command arranged, so reorder commands work on the same layout. */
+/** What the most recent tiling command arranged, so reorder commands work on the same layout and Fill Open Space can recognise the arrangement. */
 export interface LastTiling {
   scope: Scope;
   layout: LayoutId;
+  /** The slot rectangles of that tiling, in slot order; absent in data stored before they were kept. */
+  slots?: Rect[];
+}
+
+function isRect(value: unknown): value is Rect {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "x" in value &&
+    typeof value.x === "number" &&
+    "y" in value &&
+    typeof value.y === "number" &&
+    "width" in value &&
+    typeof value.width === "number" &&
+    "height" in value &&
+    typeof value.height === "number"
+  );
 }
 
 function isLastTiling(value: unknown): value is LastTiling {
@@ -35,7 +52,9 @@ function isLastTiling(value: unknown): value is LastTiling {
     "scope" in value &&
     isScope(value.scope) &&
     "layout" in value &&
-    isLayoutId(value.layout)
+    isLayoutId(value.layout) &&
+    (!("slots" in value) ||
+      (Array.isArray(value.slots) && value.slots.every(isRect)))
   );
 }
 
