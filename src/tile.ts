@@ -22,6 +22,7 @@ import {
 } from "./reorder";
 import { rectsMatch } from "./rects";
 import type { Scope } from "./scope";
+import { orderBySlotStably } from "./stability";
 import { loadLastTiling, loadLists, saveLastTiling } from "./storage";
 
 type Window = WindowManagement.Window;
@@ -103,6 +104,7 @@ async function tileWindows(request: Readonly<TileRequest>): Promise<void> {
   const {
     layout: preferredLayout,
     windowOrder,
+    fillOpenSpace,
     gap: rawGap,
     gapUnit,
     gapAtEdge,
@@ -148,10 +150,13 @@ async function tileWindows(request: Readonly<TileRequest>): Promise<void> {
       : undefined;
   const isFocused = (window: PlacedWindow): boolean => window.id === focusedId;
 
-  const [lists, desktops, scoped] = await Promise.all([
+  const [lists, desktops, scoped, lastTiling] = await Promise.all([
     loadLists(),
     WindowManagement.getDesktops(),
     windowsInScope(scope),
+    rearrange === undefined && fillOpenSpace
+      ? loadLastTiling()
+      : Promise.resolve(undefined),
   ]);
 
   const allowed = scoped.filter((window) =>
@@ -162,6 +167,12 @@ async function tileWindows(request: Readonly<TileRequest>): Promise<void> {
       window.positionable && window.resizable && isPlaced(window),
   );
   const skipped = allowed.length - tileable.length;
+
+  const facts = {
+    boundsOf: rectOf,
+    isActive: isFocused,
+    bundleIdOf: (window: PlacedWindow) => window.application?.bundleId,
+  };
 
   const byDesktop = Map.groupBy(tileable, (window) => window.desktopId);
   const moves = [...byDesktop].flatMap(([desktopId, windows]) => {
@@ -180,17 +191,24 @@ async function tileWindows(request: Readonly<TileRequest>): Promise<void> {
       gap,
       options: { emptyCellWeight },
     });
-    const ordered = orderBySlot({
-      order,
-      items: windows,
-      slots: rects,
-      facts: {
-        boundsOf: rectOf,
-        isActive: isFocused,
-        bundleIdOf: (window) => window.application?.bundleId,
-      },
-      priority: lists.include,
-    });
+    const ordered =
+      rearrange === undefined
+        ? orderBySlotStably({
+            fillOpenSpace,
+            items: windows,
+            slots: rects,
+            previousSlots: lastTiling?.slots,
+            facts,
+            order,
+            priority: lists.include,
+          })
+        : orderBySlot({
+            order,
+            items: windows,
+            slots: rects,
+            facts,
+            priority: lists.include,
+          });
     const bySlot =
       rearrange === undefined ? ordered : rearrange(ordered, rects, isFocused);
     if (bySlot === undefined) return [];

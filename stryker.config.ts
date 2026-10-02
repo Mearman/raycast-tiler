@@ -13,6 +13,7 @@ const config: PartialStrykerOptions = {
     "src/proximity.ts",
     "src/rects.ts",
     "src/reorder.ts",
+    "src/stability.ts",
   ],
   testRunner: "vitest",
   plugins: [
