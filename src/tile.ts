@@ -1,4 +1,5 @@
 import {
+  closeMainWindow,
   getPreferenceValues,
   showToast,
   Toast,
@@ -95,6 +96,8 @@ interface TileRequest {
 }
 
 async function tileWindows(request: Readonly<TileRequest>): Promise<void> {
+  // Raycast never dismisses its own window, so close it here: the desktop stays visible during the transition, and the previous application regains focus before the focused window is read.
+  await closeMainWindow({ clearRootSearch: true });
   const { scope, rearrange, verb } = request;
   const {
     layout: preferredLayout,
