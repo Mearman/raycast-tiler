@@ -77,6 +77,27 @@ export function minimumCostAssignment(cost: readonly number[][]): number[] {
   return columnOfRow;
 }
 
+/** One row per item, one column per slot: the squared distance between each item's centre and each slot's centre. */
+function centreDistanceRows<T>(
+  items: readonly T[],
+  centreOf: (item: T) => Point,
+  slots: readonly Rect[],
+): number[][] {
+  const slotCentres = slots.map((slot) => ({
+    x: slot.x + slot.width / 2,
+    y: slot.y + slot.height / 2,
+  }));
+
+  return items.map((item) => {
+    const centre = centreOf(item);
+
+    return slotCentres.map(
+      (slotCentre) =>
+        (centre.x - slotCentre.x) ** 2 + (centre.y - slotCentre.y) ** 2,
+    );
+  });
+}
+
 /**
  * Orders `items` by slot: element `k` of the result is the item assigned to `slots[k]`.
  *
@@ -89,22 +110,35 @@ export function assignToNearestSlots<T>(
 ): T[] {
   if (items.length !== slots.length)
     throw new Error("Each item needs exactly one slot");
-  const slotCentres = slots.map((slot) => ({
-    x: slot.x + slot.width / 2,
-    y: slot.y + slot.height / 2,
-  }));
-  const cost = items.map((item) => {
-    const centre = centreOf(item);
-
-    return slotCentres.map(
-      (slotCentre) =>
-        (centre.x - slotCentre.x) ** 2 + (centre.y - slotCentre.y) ** 2,
-    );
-  });
+  const cost = centreDistanceRows(items, centreOf, slots);
   const ordered = new Array<T>(items.length);
   minimumCostAssignment(cost).forEach((slotIndex, itemIndex) => {
     ordered[slotIndex] = at(items, itemIndex);
   });
 
   return ordered;
+}
+
+/**
+ * Orders `items` by slot: element `k` of the result is the item assigned to `slots[k]`, or `undefined` when no item takes that slot.
+ *
+ * There may be fewer items than slots. Items are assigned so that the total squared distance between each item's centre and its slot's centre is minimal, so items end up in the slots nearest where they already are while some slots stay open. Requires at most as many items as slots.
+ */
+export function occupyNearestSlots<T>(
+  items: readonly T[],
+  centreOf: (item: T) => Point,
+  slots: readonly Rect[],
+): (T | undefined)[] {
+  if (items.length > slots.length)
+    throw new Error("Each item needs its own slot");
+  const cost = centreDistanceRows(items, centreOf, slots);
+  // Phantom rows at zero cost square the matrix; they add a constant zero to every total, so the real rows keep the optimal columns among themselves.
+  while (cost.length < slots.length)
+    cost.push(new Array<number>(slots.length).fill(0));
+  const occupied = new Array<T | undefined>(slots.length).fill(undefined);
+  minimumCostAssignment(cost).forEach((slotIndex, itemIndex) => {
+    if (itemIndex < items.length) occupied[slotIndex] = at(items, itemIndex);
+  });
+
+  return occupied;
 }

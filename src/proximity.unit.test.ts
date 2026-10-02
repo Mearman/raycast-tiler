@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { assignToNearestSlots, minimumCostAssignment } from "./proximity";
+import {
+  assignToNearestSlots,
+  minimumCostAssignment,
+  occupyNearestSlots,
+} from "./proximity";
 
 function permutations(size: number): number[][] {
   if (size === 0) return [[]];
@@ -119,6 +123,67 @@ describe("assignToNearestSlots", () => {
   it("rejects a mismatch between items and slots", () => {
     expect(() =>
       assignToNearestSlots([1, 2], () => ({ x: 0, y: 0 }), slots),
+    ).toThrow();
+  });
+});
+
+describe("occupyNearestSlots", () => {
+  const slots = [
+    { x: 0, y: 0, width: 100, height: 100 },
+    { x: 100, y: 0, width: 100, height: 100 },
+    { x: 200, y: 0, width: 100, height: 100 },
+  ];
+
+  it("keeps windows in the slots nearest where they already are and leaves the rest open", () => {
+    const windows = [
+      { name: "left", x: 10, y: 50 },
+      { name: "right", x: 240, y: 50 },
+    ];
+    const occupied = occupyNearestSlots(
+      windows,
+      (window) => ({ x: window.x, y: window.y }),
+      slots,
+    );
+    expect(occupied.map((window) => window?.name)).toEqual([
+      "left",
+      undefined,
+      "right",
+    ]);
+  });
+
+  it("minimises total movement rather than assigning greedily", () => {
+    // "a" is closest to the middle slot, so a greedy pass gives it that slot and strands "b" in the left slot. The optimum sends "a" to the left slot and "b" to the middle one.
+    const windows = [
+      { name: "a", x: 140, y: 50 },
+      { name: "b", x: 145, y: 50 },
+    ];
+    const occupied = occupyNearestSlots(
+      windows,
+      (window) => ({ x: window.x, y: window.y }),
+      slots,
+    );
+    expect(occupied.map((window) => window?.name)).toEqual([
+      "a",
+      "b",
+      undefined,
+    ]);
+  });
+
+  it("leaves every slot open when there are no windows", () => {
+    expect(occupyNearestSlots([], () => ({ x: 0, y: 0 }), slots)).toEqual([
+      undefined,
+      undefined,
+      undefined,
+    ]);
+  });
+
+  it("rejects more windows than slots", () => {
+    expect(() =>
+      occupyNearestSlots(
+        ["a", "b", "c"],
+        () => ({ x: 0, y: 0 }),
+        slots.slice(0, 2),
+      ),
     ).toThrow();
   });
 });

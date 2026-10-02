@@ -72,6 +72,13 @@ describe("manifest", () => {
     expect(sequence).toBeDefined();
   });
 
+  it("has a preference for filling open space", () => {
+    const fill = parsed.preferences.find(
+      (pref) => pref.name === "fillOpenSpace",
+    );
+    expect(fill).toBeDefined();
+  });
+
   it("offers every gap unit in the gap unit preference", () => {
     const unit = parsed.preferences.find((pref) => pref.name === "gapUnit");
     expect(unit?.data?.map((option) => option.value)).toEqual([...GAP_UNITS]);

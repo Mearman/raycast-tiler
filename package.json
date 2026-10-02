@@ -540,6 +540,15 @@
       ]
     },
     {
+      "name": "fillOpenSpace",
+      "title": "Fill Open Space",
+      "label": "Keep the arrangement when new windows appear",
+      "description": "When most windows are already in the previous tiling's slots, windows that have moved or are new take the leftover slots and the tiled ones keep the slots nearest where they are, instead of the Window Order preference rearranging every window.",
+      "type": "checkbox",
+      "required": false,
+      "default": false
+    },
+    {
       "name": "gap",
       "title": "Gap",
       "description": "Space between windows and around the screen edge, in the unit below. Negative values make neighbouring windows overlap; the screen edge is never pushed outwards.",
