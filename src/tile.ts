@@ -215,7 +215,12 @@ async function tileWindows(request: Readonly<TileRequest>): Promise<void> {
 
     return;
   }
-  if (rearrange === undefined) await saveLastTiling({ scope, layout });
+  if (rearrange === undefined)
+    await saveLastTiling({
+      scope,
+      layout,
+      slots: moves.map((move) => move.rect),
+    });
 
   // Windows already on their target are left alone, which also keeps them out of the sequential transition's time budget.
   const outstanding = moves.filter(
