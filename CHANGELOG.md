@@ -1,3 +1,19 @@
+## [1.3.0](https://github.com/Mearman/raycast-tiler/compare/v1.2.1...v1.3.0) (2026-10-02)
+
+### Features
+
+* keep the current arrangement when most windows are tiled ([4fad80c](https://github.com/Mearman/raycast-tiler/commit/4fad80cf3015aa79afc2628632ec7d120dc2fbb8))
+* leave windows already on their target rectangle unmoved ([7a7e8ce](https://github.com/Mearman/raycast-tiler/commit/7a7e8ce5a555a424ab5a1925014cb09e3c1a6f40))
+* remember the slot rectangles of the last tiling ([429be56](https://github.com/Mearman/raycast-tiler/commit/429be56807740a697c108b7fba99b22f31e5b9a9))
+
+### Bug Fixes
+
+* close the main window when a tiling command runs ([a6049ca](https://github.com/Mearman/raycast-tiler/commit/a6049cad426d44972b8e486cae588cfb273450a0))
+
+### Documentation
+
+* describe filling open space and skipping settled windows ([43964eb](https://github.com/Mearman/raycast-tiler/commit/43964eb39f11968401d7daf0b60c377f097523b3))
+
 ## [1.2.1](https://github.com/Mearman/raycast-tiler/compare/v1.2.0...v1.2.1) (2026-09-29)
 
 ### Documentation
