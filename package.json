@@ -579,7 +579,7 @@
     {
       "name": "layout",
       "title": "Layout",
-      "description": "How windows are arranged.",
+      "description": "How windows are arranged by Tile Windows and Tile App. Tile with Layout, a command's Layout argument and the per-layout commands override it, and auto tiling reuses the layout of the last tiling.",
       "type": "dropdown",
       "required": false,
       "default": "grid",
@@ -609,7 +609,7 @@
     {
       "name": "gridBalance",
       "title": "Grid Balance",
-      "description": "How the Grid layout picks its columns. Even Rows prefers full rows over cells that match the screen's shape (eight windows become two rows of four). Screen Shape follows the screen's shape alone (eight windows become rows of 3, 3 and 2). Custom uses the penalty below.",
+      "description": "Grid layout only. How it picks its columns. Even Rows prefers full rows over cells that match the screen's shape (eight windows become two rows of four). Screen Shape follows the screen's shape alone (eight windows become rows of 3, 3 and 2). Custom uses the penalty below.",
       "type": "dropdown",
       "required": false,
       "default": "even-rows",
@@ -631,7 +631,7 @@
     {
       "name": "gridEmptyCellPenalty",
       "title": "Grid Empty Cell Penalty",
-      "description": "Used when Grid Balance is Custom. How strongly the Grid layout avoids empty cells in a short last row, relative to matching the screen's shape. 0 ignores empty cells; larger values prefer full rows. Must be a non-negative number.",
+      "description": "Grid layout with Custom balance only. How strongly it avoids empty cells in a short last row, relative to matching the screen's shape. 0 ignores empty cells; larger values prefer full rows. Must be a non-negative number.",
       "type": "textfield",
       "required": false,
       "default": "4",
@@ -640,7 +640,7 @@
     {
       "name": "windowOrder",
       "title": "Window Order",
-      "description": "Which window goes in which layout slot. Nearest keeps windows close to where they are; Reading Order goes top to bottom then left to right; Active First puts the focused window in the first slot (the main slot in Main + Stack); App Priority follows the order of the include list; Previous Order keeps windows in the order they had in the last tiling.",
+      "description": "Which window goes in which layout slot. Previous Order (the default) keeps windows in the order they had in the last tiling, so they hold their relative places as windows open and close. Nearest Slot keeps windows close to where they are. Reading Order goes top to bottom then left to right. Active First puts the focused window in the first slot (the main slot in Main and Stack). App Priority follows the order of the include list.",
       "type": "dropdown",
       "required": false,
       "default": "previous",
@@ -671,7 +671,7 @@
       "name": "fillOpenSpace",
       "title": "Fill Open Space",
       "label": "Keep the arrangement when new windows appear",
-      "description": "When most windows are already in the previous tiling's slots, windows that have moved or are new take the leftover slots and the tiled ones keep the slots nearest where they are, instead of the Window Order preference rearranging every window.",
+      "description": "Off by default. When most windows are already in the previous tiling's slots, windows that have moved or are new take the leftover slots and the tiled ones keep the slots nearest where they are, instead of the Window Order preference rearranging every window. It matters most with Reading Order, Active First and App Priority; Nearest Slot and Previous Order already keep windows near where they are.",
       "type": "checkbox",
       "required": false,
       "default": false
