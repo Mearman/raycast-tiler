@@ -7,9 +7,11 @@ import {
   Icon,
   Keyboard,
   List,
+  WindowManagement,
 } from "@raycast/api";
 import { showFailureToast, usePromise } from "@raycast/utils";
 import { move, toggle, type AppLists } from "./filter";
+import { SECTIONS, sectionOf, type Section } from "./list-sections";
 import { loadLists, saveLists } from "./storage";
 
 interface Row {
@@ -17,14 +19,15 @@ interface Row {
   bundleId: string;
 }
 
-const SECTIONS = ["Excluded", "Included", "Other"] as const;
-type Section = (typeof SECTIONS)[number];
+/** Bundle IDs of the applications with a window on the active desktop. */
+async function openBundleIds(): Promise<Set<string>> {
+  const windows = await WindowManagement.getWindowsOnActiveDesktop();
 
-function sectionOf(row: Row, lists: AppLists): Section {
-  if (lists.exclude.includes(row.bundleId)) return "Excluded";
-  if (lists.include.includes(row.bundleId)) return "Included";
-
-  return "Other";
+  return new Set(
+    windows
+      .map((window) => window.application?.bundleId)
+      .filter((bundleId) => bundleId !== undefined),
+  );
 }
 
 /** Included applications keep the include list's order, which App Priority uses; the others are alphabetical. */
@@ -32,8 +35,11 @@ function rowsIn(
   section: Section,
   rows: readonly Row[],
   lists: AppLists,
+  open: ReadonlySet<string>,
 ): Row[] {
-  const inSection = rows.filter((row) => sectionOf(row, lists) === section);
+  const inSection = rows.filter(
+    (row) => sectionOf(row.bundleId, lists, open) === section,
+  );
   if (section !== "Included") return inSection;
 
   return inSection.sort(
@@ -44,6 +50,7 @@ function rowsIn(
 
 export default function Command() {
   const { data: apps, isLoading: loadingApps } = usePromise(getApplications);
+  const { data: open, isLoading: loadingOpen } = usePromise(openBundleIds);
   const {
     data: lists,
     isLoading: loadingLists,
@@ -63,10 +70,11 @@ export default function Command() {
 
   return (
     <List
-      isLoading={loadingApps || loadingLists}
+      isLoading={loadingApps || loadingLists || loadingOpen}
       searchBarPlaceholder="Search applications"
     >
       {lists &&
+        open &&
         SECTIONS.map((section) => (
           <List.Section
             key={section}
@@ -74,10 +82,12 @@ export default function Command() {
             subtitle={
               section === "Included"
                 ? "Only these are tiled, in this order for App Priority"
-                : undefined
+                : section === "Open Now"
+                  ? "Have a window on this desktop"
+                  : undefined
             }
           >
-            {rowsIn(section, rows, lists).map((row) => (
+            {rowsIn(section, rows, lists, open).map((row) => (
               <List.Item
                 key={row.bundleId}
                 title={row.app.name}
