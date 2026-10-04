@@ -480,15 +480,16 @@
       ]
     },
     {
-      "name": "auto-tile",
-      "title": "Auto Tile",
-      "description": "The scheduled check behind auto tiling. Open it once so Raycast starts the schedule; it then re-tiles quietly in the background while auto tiling is on.",
-      "mode": "no-view",
+      "name": "auto-tiling",
+      "title": "Auto Tiling",
+      "description": "Menu bar item that shows whether auto tiling is on and switches it. Raycast reruns it every 30 seconds, and each run re-tiles quietly while auto tiling is on and windows have opened or closed.",
+      "mode": "menu-bar",
       "interval": "30s",
       "keywords": [
         "auto",
         "automatic",
         "background",
+        "menu",
         "tile"
       ]
     }
