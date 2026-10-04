@@ -10,6 +10,7 @@ const config: PartialStrykerOptions = {
     "src/window-set.ts",
     "src/direction.ts",
     "src/filter.ts",
+    "src/list-sections.ts",
     "src/ordering.ts",
     "src/proximity.ts",
     "src/rects.ts",

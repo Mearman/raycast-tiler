@@ -13,7 +13,7 @@ Raycast extension that tiles macOS windows into a layout, with include and exclu
 - **Tile with Layout** lists the layouts with icons and tiles the active desktop (default action) or the frontmost application with the one chosen.
 - **Undo Tiling** puts the windows the last tiling, reorder or auto tiling run moved back where they were, on the active desktop only. Running it again redoes the run.
 - **Rotate Windows Forward** and **Rotate Windows Back** move every window one slot along and wrap at the ends.
-- **Tiling Lists** edits two lists of applications, matched by bundle ID. Applications on the exclude list are never tiled. When the include list is not empty, only its applications are tiled. Exclude wins over include. The order of the include list is the priority order for the App Priority window order, and Move Up and Move Down change it.
+- **Tiling Lists** edits two lists of applications, matched by bundle ID. Applications on the exclude list are never tiled. When the include list is not empty, only its applications are tiled. Exclude wins over include. Applications with a window on the active desktop are listed first, under Open Now. The order of the include list is the priority order for the App Priority window order, and Move Up and Move Down change it.
 
 Reorder commands use the layout and scope of the last tiling command. They match windows to slots by current position, whatever the Window Order preference says.
 
