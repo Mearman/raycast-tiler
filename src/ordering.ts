@@ -6,6 +6,7 @@ export const ORDER_IDS = [
   "reading",
   "active-first",
   "app-priority",
+  "previous",
 ] as const;
 
 /** How windows are matched to layout slots. */
@@ -70,6 +71,8 @@ export interface OrderRequest<T> {
   facts: WindowFacts<T>;
   /** Application bundle IDs, highest priority first; used by `app-priority`. */
   priority: readonly string[];
+  /** The slot rectangles of the previous tiling in slot order, or `undefined` when none were stored; used by `previous`. */
+  previousSlots: readonly Rect[] | undefined;
 }
 
 /**
@@ -79,11 +82,12 @@ export interface OrderRequest<T> {
  * - `reading`: windows in reading order (see {@link readingOrder}) take the slots in order.
  * - `active-first`: the active window takes the first slot and the rest go to the nearest remaining slots.
  * - `app-priority`: windows sort by their application's position in `priority` (unlisted applications last), ties in reading order, and take the slots in order.
+ * - `previous`: each window ranks as the index of the previous tiling's slot nearest its centre, so tiled windows keep their relative order and others slot in beside the slot they are closest to; ties in reading order. Without `previousSlots` this is reading order.
  *
  * Requires as many slots as items.
  */
 export function orderBySlot<T>(request: Readonly<OrderRequest<T>>): T[] {
-  const { items, slots, facts, priority } = request;
+  const { items, slots, facts, priority, previousSlots } = request;
   const nearest = (candidates: readonly T[], available: readonly Rect[]) =>
     assignToNearestSlots(
       candidates,
@@ -112,6 +116,24 @@ export function orderBySlot<T>(request: Readonly<OrderRequest<T>>): T[] {
           bundleId === undefined ? -1 : priority.indexOf(bundleId);
 
         return position === -1 ? priority.length : position;
+      };
+
+      return readingOrder(items, facts.boundsOf).sort(
+        (a, b) => rank(a) - rank(b),
+      );
+    },
+    previous: () => {
+      if (previousSlots === undefined)
+        return readingOrder(items, facts.boundsOf);
+      const rank = (item: T): number => {
+        const centre = centreOf(facts.boundsOf(item));
+        const distances = previousSlots.map((slot) => {
+          const target = centreOf(slot);
+
+          return Math.hypot(centre.x - target.x, centre.y - target.y);
+        });
+
+        return distances.indexOf(Math.min(...distances));
       };
 
       return readingOrder(items, facts.boundsOf).sort(
