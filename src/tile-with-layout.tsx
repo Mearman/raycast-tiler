@@ -1,14 +1,7 @@
 import { Action, ActionPanel, List } from "@raycast/api";
-import { LAYOUT_IDS, type LayoutId } from "./layouts/types";
+import { LAYOUT_TITLES } from "./layouts/titles";
+import { LAYOUT_IDS } from "./layouts/types";
 import { runTile } from "./tile";
-
-const LAYOUT_TITLES: Record<LayoutId, string> = {
-  grid: "Grid",
-  columns: "Columns",
-  rows: "Rows",
-  "main-stack": "Main and Stack",
-  spiral: "Spiral",
-};
 
 export default function Command() {
   return (

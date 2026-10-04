@@ -11,6 +11,7 @@ import { windowSetChanged } from "./window-set";
 import { isAllowed } from "./filter";
 import { emptyCellWeightFor, isGridBalance } from "./grid-balance";
 import { isGapUnit } from "./layouts/gap";
+import { LAYOUT_TITLES } from "./layouts/titles";
 import { isLayoutId, type LayoutId, type Rect } from "./layouts/types";
 import { layoutWindows } from "./layouts/layout-windows";
 import { isOrderId, orderBySlot, type OrderId } from "./ordering";
@@ -29,6 +30,7 @@ import { rectsMatch } from "./rects";
 import type { Scope } from "./scope";
 import { orderBySlotStably } from "./stability";
 import {
+  loadAutoTile,
   loadLastTiling,
   loadLists,
   loadUndo,
@@ -202,6 +204,7 @@ async function tileWindows(request: Readonly<TileRequest>): Promise<void> {
 
   const lastTiling =
     rearrange === undefined ? await loadLastTiling() : undefined;
+  const autoTiling = auto === "now" || (await loadAutoTile());
   const autoApps = auto === undefined ? undefined : lastTiling?.bundleIds;
   if (auto !== undefined && autoApps === undefined) {
     if (auto === "now")
@@ -343,7 +346,8 @@ async function tileWindows(request: Readonly<TileRequest>): Promise<void> {
     if (auto === "quiet") return;
     await showToast({
       style: Toast.Style.Success,
-      title: `${verb} ${String(tiled)} ${tiled === 1 ? "window" : "windows"}`,
+      title: `${verb} ${String(tiled)} ${tiled === 1 ? "window" : "windows"} in ${LAYOUT_TITLES[layout]}`,
+      message: autoTiling ? "Auto tiling is on" : undefined,
     });
 
     return;

@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { GRID_BALANCES } from "./grid-balance";
 import { GAP_UNITS } from "./layouts/gap";
+import { LAYOUT_TITLES } from "./layouts/titles";
 import { LAYOUT_IDS } from "./layouts/types";
 import { ORDER_IDS } from "./ordering";
 import { SCOPES } from "./scope";
@@ -21,7 +22,7 @@ interface Command {
 interface Preference {
   name: string;
   default?: string | boolean;
-  data?: { value: string }[];
+  data?: { value: string; title?: string }[];
 }
 interface Manifest {
   commands: Command[];
@@ -133,6 +134,13 @@ describe("manifest", () => {
       expect(position?.required).toBe(true);
     },
   );
+
+  it("names every layout as the layout preference does", () => {
+    const layout = parsed.preferences.find((pref) => pref.name === "layout");
+    expect(layout?.data?.map((option) => option.title)).toEqual(
+      LAYOUT_IDS.map((id) => LAYOUT_TITLES[id]),
+    );
+  });
 
   it("offers every window order in the window order preference", () => {
     const order = parsed.preferences.find(
