@@ -15,6 +15,7 @@ interface Argument {
 interface Command {
   name: string;
   disabledByDefault?: boolean;
+  interval?: string;
   arguments?: Argument[];
 }
 interface Preference {
@@ -181,6 +182,22 @@ describe("manifest", () => {
       .filter((command) => command.disabledByDefault === true)
       .map((command) => command.name);
     expect(disabled.sort()).toEqual(dedicated.sort());
+  });
+
+  it("schedules only the auto tile check", () => {
+    const scheduled = parsed.commands
+      .filter((command) => command.interval !== undefined)
+      .map((command) => command.name);
+    expect(scheduled).toEqual(["auto-tile"]);
+  });
+
+  it.each([
+    "enable-auto-tiling",
+    "disable-auto-tiling",
+    "toggle-auto-tiling",
+    "auto-tile",
+  ])("registers the auto tiling command %s", (name) => {
+    expect(parsed.commands.map((command) => command.name)).toContain(name);
   });
 
   it("has an entry file for every command", () => {

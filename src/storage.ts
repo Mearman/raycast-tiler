@@ -28,6 +28,16 @@ export interface LastTiling {
   layout: LayoutId;
   /** The slot rectangles of that tiling, in slot order; absent in data stored before they were kept. */
   slots?: Rect[];
+  /** Bundle IDs of the applications that tiling arranged, which auto tiling keeps arranging; absent in data stored before they were kept. */
+  bundleIds?: string[];
+  /** IDs of the windows that tiling arranged, so auto tiling can tell when the set has changed; absent in data stored before they were kept. */
+  windowIds?: string[];
+}
+
+function isStrings(value: unknown): value is string[] {
+  return (
+    Array.isArray(value) && value.every((entry) => typeof entry === "string")
+  );
 }
 
 function isRect(value: unknown): value is Rect {
@@ -54,7 +64,9 @@ function isLastTiling(value: unknown): value is LastTiling {
     "layout" in value &&
     isLayoutId(value.layout) &&
     (!("slots" in value) ||
-      (Array.isArray(value.slots) && value.slots.every(isRect)))
+      (Array.isArray(value.slots) && value.slots.every(isRect))) &&
+    (!("bundleIds" in value) || isStrings(value.bundleIds)) &&
+    (!("windowIds" in value) || isStrings(value.windowIds))
   );
 }
 
@@ -72,4 +84,15 @@ export async function saveLastTiling(
   tiling: Readonly<LastTiling>,
 ): Promise<void> {
   await LocalStorage.setItem(LAST_TILING_KEY, JSON.stringify(tiling));
+}
+
+const AUTO_TILE_KEY = "auto-tile-enabled";
+
+/** Whether auto tiling is switched on; it is off until enabled. */
+export async function loadAutoTile(): Promise<boolean> {
+  return (await LocalStorage.getItem<boolean>(AUTO_TILE_KEY)) === true;
+}
+
+export async function saveAutoTile(enabled: boolean): Promise<void> {
+  await LocalStorage.setItem(AUTO_TILE_KEY, enabled);
 }
