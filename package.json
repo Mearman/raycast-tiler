@@ -382,6 +382,46 @@
       ]
     },
     {
+      "name": "swap-window-with-number",
+      "title": "Swap Window With Number",
+      "description": "Swap the focused window with the window at a number in reading order (left to right, top to bottom, counting from 1).",
+      "mode": "no-view",
+      "keywords": [
+        "number",
+        "reading",
+        "reorder",
+        "swap"
+      ],
+      "arguments": [
+        {
+          "name": "position",
+          "type": "text",
+          "placeholder": "Number in reading order",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "insert-window-before-number",
+      "title": "Insert Window Before Number",
+      "description": "Move the focused window to just before the window at a number in reading order and shift the windows in between along by one.",
+      "mode": "no-view",
+      "keywords": [
+        "insert",
+        "number",
+        "reading",
+        "reorder"
+      ],
+      "arguments": [
+        {
+          "name": "position",
+          "type": "text",
+          "placeholder": "Number in reading order",
+          "required": true
+        }
+      ]
+    },
+    {
       "name": "rotate-windows-forward",
       "title": "Rotate Windows Forward",
       "description": "Move every window one slot forward in the current layout, the last to the first.",

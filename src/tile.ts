@@ -14,10 +14,14 @@ import { isLayoutId, type LayoutId, type Rect } from "./layouts/types";
 import { layoutWindows } from "./layouts/layout-windows";
 import { isOrderId, orderBySlot, type OrderId } from "./ordering";
 import {
+  insertBeforeNumbered,
   moveActiveTo,
+  parseWindowNumber,
   rotate,
   swapActive,
   swapInDirection,
+  swapWithNumbered,
+  type NumberedMove,
   type ReorderAction,
 } from "./reorder";
 import { rectsMatch } from "./rects";
@@ -321,6 +325,17 @@ const REARRANGE: Record<ReorderAction, Rearrange> = {
   "rotate-back": (ordered) => rotate(ordered, -1),
 };
 
+async function reorderWith(rearrange: Rearrange): Promise<void> {
+  const last = await loadLastTiling();
+  await tileWindows({
+    scope: last?.scope ?? "desktop",
+    layout: last?.layout,
+    order: "nearest",
+    rearrange,
+    verb: "Reordered",
+  });
+}
+
 /**
  * Reorders the windows within the layout the last tiling command used, reporting any error as a failure toast.
  *
@@ -328,14 +343,31 @@ const REARRANGE: Record<ReorderAction, Rearrange> = {
  */
 export async function runReorder(action: ReorderAction): Promise<void> {
   try {
-    const last = await loadLastTiling();
-    await tileWindows({
-      scope: last?.scope ?? "desktop",
-      layout: last?.layout,
-      order: "nearest",
-      rearrange: REARRANGE[action],
-      verb: "Reordered",
-    });
+    await reorderWith(REARRANGE[action]);
+  } catch (error) {
+    await showFailureToast(error, { title: "Could not reorder windows" });
+  }
+}
+
+const NUMBERED: Record<NumberedMove, typeof swapWithNumbered> = {
+  swap: swapWithNumbered,
+  insert: insertBeforeNumbered,
+};
+
+/**
+ * Swaps the focused window with, or inserts it before, the window at `position` in reading order (counting from 1), reporting any error as a failure toast.
+ *
+ * `position` is the raw text of the command argument. Windows are matched to slots as in {@link runReorder}.
+ */
+export async function runNumberedReorder(
+  move: NumberedMove,
+  position: string,
+): Promise<void> {
+  try {
+    const number = parseWindowNumber(position);
+    await reorderWith((ordered, slots, isFocused) =>
+      NUMBERED[move](ordered, slots, isFocused, number),
+    );
   } catch (error) {
     await showFailureToast(error, { title: "Could not reorder windows" });
   }

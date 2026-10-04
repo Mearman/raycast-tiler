@@ -5,7 +5,7 @@ import { GAP_UNITS } from "./layouts/gap";
 import { LAYOUT_IDS } from "./layouts/types";
 import { ORDER_IDS } from "./ordering";
 import { SCOPES } from "./scope";
-import { REORDER_ACTIONS } from "./reorder";
+import { NUMBERED_MOVES, REORDER_ACTIONS } from "./reorder";
 
 interface Argument {
   name: string;
@@ -115,6 +115,23 @@ describe("manifest", () => {
       : `move-window-${action}`;
     expect(parsed.commands.map((command) => command.name)).toContain(name);
   });
+
+  it.each(NUMBERED_MOVES)(
+    "registers a numbered %s command with a required position argument",
+    (move) => {
+      const command = parsed.commands.find(
+        (c) =>
+          c.name ===
+          (move === "swap"
+            ? "swap-window-with-number"
+            : "insert-window-before-number"),
+      );
+      const position = command?.arguments?.find(
+        (arg) => arg.name === "position",
+      );
+      expect(position?.required).toBe(true);
+    },
+  );
 
   it("offers every window order in the window order preference", () => {
     const order = parsed.preferences.find(

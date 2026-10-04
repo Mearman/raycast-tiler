@@ -1,14 +1,17 @@
 import { describe, expect, it } from "vitest";
 import { layoutWindows } from "./layouts/layout-windows";
 import {
+  insertBeforeNumbered,
   isReorderAction,
   moveActiveTo,
+  parseWindowNumber,
   REORDER_ACTIONS,
   rotate,
   swapActive,
   swapInDirection,
+  swapWithNumbered,
 } from "./reorder";
-import type { LayoutOptions } from "./layouts/types";
+import type { LayoutOptions, Rect } from "./layouts/types";
 
 /** A zero weight keeps the expectations below independent of how the grid penalises empty cells. */
 const LAYOUT_OPTIONS: LayoutOptions = { emptyCellWeight: 0 };
@@ -150,5 +153,96 @@ describe("isReorderAction", () => {
     for (const action of REORDER_ACTIONS)
       expect(isReorderAction(action)).toBe(true);
     expect(isReorderAction("sideways")).toBe(false);
+  });
+});
+
+/** Side length of every numbered-move test slot. */
+const CELL = 100;
+const THIRD = 3;
+const BEYOND_LAST = 5;
+const FRACTION = 1.5;
+
+/** Slots deliberately out of reading order: item `k` sits in `SHUFFLED[k]`, so in reading order the items run b, c, d, a. */
+const SHUFFLED: Rect[] = [
+  { x: CELL, y: CELL, width: CELL, height: CELL },
+  { x: 0, y: 0, width: CELL, height: CELL },
+  { x: CELL, y: 0, width: CELL, height: CELL },
+  { x: 0, y: CELL, width: CELL, height: CELL },
+];
+const ITEMS = ["a", "b", "c", "d"];
+const is = (name: string) => (item: string) => item === name;
+
+describe("swapWithNumbered", () => {
+  it("swaps the active item with the item at that place in reading order", () => {
+    expect(swapWithNumbered(ITEMS, SHUFFLED, is("a"), 1)).toEqual([
+      "b",
+      "a",
+      "c",
+      "d",
+    ]);
+    expect(swapWithNumbered(ITEMS, SHUFFLED, is("b"), THIRD)).toEqual([
+      "a",
+      "d",
+      "c",
+      "b",
+    ]);
+  });
+
+  it("changes nothing when the active item is at that place", () => {
+    expect(swapWithNumbered(ITEMS, SHUFFLED, is("b"), 1)).toEqual(ITEMS);
+  });
+
+  it("returns undefined when nothing is active", () => {
+    expect(swapWithNumbered(ITEMS, SHUFFLED, is("z"), 1)).toBeUndefined();
+  });
+
+  it.each([0, BEYOND_LAST, FRACTION, -1])("rejects place %s", (place) => {
+    expect(() => swapWithNumbered(ITEMS, SHUFFLED, is("a"), place)).toThrow(
+      /no window number/,
+    );
+  });
+});
+
+describe("insertBeforeNumbered", () => {
+  it("moves the active item before the numbered one and shifts the ones between along", () => {
+    expect(insertBeforeNumbered(ITEMS, SHUFFLED, is("a"), 2)).toEqual([
+      "d",
+      "b",
+      "a",
+      "c",
+    ]);
+  });
+
+  it("moves a window from early in reading order to a later place", () => {
+    expect(insertBeforeNumbered(ITEMS, SHUFFLED, is("b"), THIRD)).toEqual([
+      "a",
+      "c",
+      "b",
+      "d",
+    ]);
+  });
+
+  it("changes nothing when inserting before itself", () => {
+    expect(insertBeforeNumbered(ITEMS, SHUFFLED, is("b"), 1)).toEqual(ITEMS);
+  });
+
+  it("returns undefined when nothing is active", () => {
+    expect(insertBeforeNumbered(ITEMS, SHUFFLED, is("z"), 1)).toBeUndefined();
+  });
+
+  it.each([0, BEYOND_LAST, FRACTION])("rejects place %s", (place) => {
+    expect(() => insertBeforeNumbered(ITEMS, SHUFFLED, is("a"), place)).toThrow(
+      /no window number/,
+    );
+  });
+});
+
+describe("parseWindowNumber", () => {
+  it("reads a whole number, ignoring surrounding space", () => {
+    expect(parseWindowNumber(" 3 ")).toBe(THIRD);
+  });
+
+  it.each(["", "  ", "two", "1.5"])("rejects %j", (raw) => {
+    expect(() => parseWindowNumber(raw)).toThrow(/whole number/);
   });
 });
