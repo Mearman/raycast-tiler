@@ -184,18 +184,18 @@ describe("manifest", () => {
     expect(disabled.sort()).toEqual(dedicated.sort());
   });
 
-  it("schedules only the auto tile check", () => {
+  it("schedules only the auto tiling menu bar command", () => {
     const scheduled = parsed.commands
       .filter((command) => command.interval !== undefined)
       .map((command) => command.name);
-    expect(scheduled).toEqual(["auto-tile"]);
+    expect(scheduled).toEqual(["auto-tiling"]);
   });
 
   it.each([
     "enable-auto-tiling",
     "disable-auto-tiling",
     "toggle-auto-tiling",
-    "auto-tile",
+    "auto-tiling",
   ])("registers the auto tiling command %s", (name) => {
     expect(parsed.commands.map((command) => command.name)).toContain(name);
   });
