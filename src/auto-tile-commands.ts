@@ -6,7 +6,7 @@ import { loadAutoTile, saveAutoTile } from "./storage";
 export async function setAutoTiling(enabled: boolean): Promise<void> {
   await saveAutoTile(enabled);
   await showHUD(enabled ? "Auto tiling on" : "Auto tiling off");
-  if (enabled) await runAutoTile("visible");
+  if (enabled) await runAutoTile("now");
 }
 
 export async function toggleAutoTiling(): Promise<void> {
