@@ -1,3 +1,13 @@
+## [1.6.0](https://github.com/Mearman/raycast-tiler/compare/v1.5.0...v1.6.0) (2026-10-04)
+
+### Features
+
+* add commands to swap or insert the focused window by reading-order number ([cf1f554](https://github.com/Mearman/raycast-tiler/commit/cf1f55492604adf5943661f1012c88b0b5c6d3d0))
+
+### Bug Fixes
+
+* title-case the swap by number command ([42f0f1d](https://github.com/Mearman/raycast-tiler/commit/42f0f1d051e939628dda1c8f108d263f6cc692c5))
+
 ## [1.5.0](https://github.com/Mearman/raycast-tiler/compare/v1.4.0...v1.5.0) (2026-10-04)
 
 ### Features
