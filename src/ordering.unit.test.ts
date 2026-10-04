@@ -99,6 +99,7 @@ describe("orderBySlot", () => {
           slots: SLOTS,
           facts,
           priority: [],
+          previousSlots: undefined,
         }),
       ),
     ).toEqual(["top-left", "top-right", "bottom-left", "bottom-right"]);
@@ -114,6 +115,7 @@ describe("orderBySlot", () => {
           slots: shifted,
           facts,
           priority: [],
+          previousSlots: undefined,
         }),
       ),
     ).toEqual(["top-left", "top-right", "bottom-left", "bottom-right"]);
@@ -135,6 +137,7 @@ describe("orderBySlot", () => {
           slots: SLOTS,
           facts,
           priority: [],
+          previousSlots: undefined,
         }),
       ),
     ).toEqual(["focused", "b", "c", "a"]);
@@ -150,6 +153,7 @@ describe("orderBySlot", () => {
           slots: SLOTS,
           facts,
           priority: [],
+          previousSlots: undefined,
         }),
       ),
     ).toEqual(
@@ -160,6 +164,7 @@ describe("orderBySlot", () => {
           slots: SLOTS,
           facts,
           priority: [],
+          previousSlots: undefined,
         }),
       ),
     );
@@ -174,6 +179,7 @@ describe("orderBySlot", () => {
           slots: SLOTS,
           facts,
           priority: ["a", "b"],
+          previousSlots: undefined,
         }),
       ),
     ).toEqual(["bottom-left", "top-left", "top-right", "bottom-right"]);
@@ -188,8 +194,65 @@ describe("orderBySlot", () => {
           slots: SLOTS,
           facts,
           priority: [],
+          previousSlots: undefined,
         }),
       ),
     ).toEqual(names(readingOrder(windows, facts.boundsOf)));
+  });
+
+  describe("previous", () => {
+    const COLUMNS: Rect[] = [0, 1, 2].map((index) => ({
+      x: index * CELL,
+      y: 0,
+      width: CELL,
+      height: CELL,
+    }));
+    const previous = (items: readonly Item[], slots: readonly Rect[]) =>
+      names(
+        orderBySlot({
+          order: "previous",
+          items,
+          slots,
+          facts,
+          priority: [],
+          previousSlots: COLUMNS,
+        }),
+      );
+
+    it("ranks windows by the nearest previous slot, not by their current row", () => {
+      // "low" sits below the row but is closest to the first stored column, so it stays ahead of "mid".
+      const items = [
+        item("mid", CELL, 0),
+        item("low", 0, FAR),
+        item("end", CELL * 2, 0),
+      ];
+      expect(previous(items, SLOTS)).toEqual(["low", "mid", "end"]);
+      expect(names(readingOrder(items, facts.boundsOf))).toEqual([
+        "mid",
+        "end",
+        "low",
+      ]);
+    });
+
+    it("breaks ties between windows nearest the same slot in reading order", () => {
+      const items = [item("right", SLIGHT_OFFSET, 0), item("left", 0, 0)];
+      expect(previous(items, SLOTS)).toEqual(["left", "right"]);
+    });
+
+    it("is reading order without stored slots", () => {
+      const items = [item("b", CELL, 0), item("a", 0, 0)];
+      expect(
+        names(
+          orderBySlot({
+            order: "previous",
+            items,
+            slots: SLOTS,
+            facts,
+            priority: [],
+            previousSlots: undefined,
+          }),
+        ),
+      ).toEqual(names(readingOrder(items, facts.boundsOf)));
+    });
   });
 });

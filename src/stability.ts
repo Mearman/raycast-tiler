@@ -30,7 +30,14 @@ export function orderBySlotStably<T>(
 ): T[] {
   const { items, slots, facts, order, priority } = request;
   const byOrder = (): T[] =>
-    orderBySlot({ order, items, slots, facts, priority });
+    orderBySlot({
+      order,
+      items,
+      slots,
+      facts,
+      priority,
+      previousSlots: request.previousSlots,
+    });
 
   if (!request.fillOpenSpace || request.previousSlots === undefined)
     return byOrder();
@@ -63,6 +70,7 @@ export function orderBySlotStably<T>(
     slots: openSlots,
     facts,
     priority,
+    previousSlots: request.previousSlots,
   });
 
   let next = 0;

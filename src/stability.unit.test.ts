@@ -71,7 +71,14 @@ function plainOrder(
   slots: readonly Rect[],
   order: OrderId = "reading",
 ): Item[] {
-  return orderBySlot({ order, items, slots, facts, priority: [] });
+  return orderBySlot({
+    order,
+    items,
+    slots,
+    facts,
+    priority: [],
+    previousSlots: undefined,
+  });
 }
 
 const names = (items: readonly Item[]) => items.map((window) => window.name);
@@ -210,5 +217,22 @@ describe("orderBySlotStably", () => {
     // Which of the two takes the first column is a tie; the floating window always ends in the last.
     expect(result.at(-1)?.name).toBe("f");
     expect([...names(result)].sort()).toEqual(["f", "first", "second"]);
+  });
+
+  it("passes the stored slots on to the previous window order", () => {
+    // "low" is nearest the first stored column, so Previous Order puts it first although reading order puts it last.
+    const items = [item("mid", CELL, 0), item("low", 0, ROW_BELOW)];
+    const previous = columns(STORED);
+    expect(
+      names(
+        stable({
+          items,
+          slots: columns(2),
+          previousSlots: previous,
+          order: "previous",
+          fillOpenSpace: false,
+        }),
+      ),
+    ).toEqual(["low", "mid"]);
   });
 });

@@ -154,7 +154,7 @@ async function tileWindows(request: Readonly<TileRequest>): Promise<void> {
     loadLists(),
     WindowManagement.getDesktops(),
     windowsInScope(scope),
-    rearrange === undefined && fillOpenSpace
+    rearrange === undefined && (fillOpenSpace || order === "previous")
       ? loadLastTiling()
       : Promise.resolve(undefined),
   ]);
@@ -208,6 +208,7 @@ async function tileWindows(request: Readonly<TileRequest>): Promise<void> {
             slots: rects,
             facts,
             priority: lists.include,
+            previousSlots: undefined,
           });
     const bySlot =
       rearrange === undefined ? ordered : rearrange(ordered, rects, isFocused);
