@@ -1,3 +1,17 @@
+## [1.8.0](https://github.com/Mearman/raycast-tiler/compare/v1.7.1...v1.8.0) (2026-10-04)
+
+### Features
+
+* add a Tile with Layout list and layout icons for the per-layout commands ([0263474](https://github.com/Mearman/raycast-tiler/commit/0263474903135acda33695d742c4d8d90e7c13b1))
+* add an Undo Tiling command that restores the windows the last run moved ([4008dd0](https://github.com/Mearman/raycast-tiler/commit/4008dd009f6a7bdd3f09c064f6c5fdc5e4bb3d7b))
+* list applications with a window on the desktop first in Tiling Lists ([5ff2d47](https://github.com/Mearman/raycast-tiler/commit/5ff2d476d73233320a15dd09d5529e474dffa21e))
+* name the layout and the auto tiling state in the tiling toast ([329f73c](https://github.com/Mearman/raycast-tiler/commit/329f73c6636a52c17af93ff129ea7c4ee180a4dc))
+* replace the Auto Tile command with an auto tiling menu bar item ([7056649](https://github.com/Mearman/raycast-tiler/commit/7056649401466c77304349ac3203679f50a4d430))
+
+### Documentation
+
+* say when each preference applies and which window order is the default ([92f4740](https://github.com/Mearman/raycast-tiler/commit/92f4740328f5f28cb6b5c7ff82140d20b02d64df))
+
 ## [1.7.1](https://github.com/Mearman/raycast-tiler/compare/v1.7.0...v1.7.1) (2026-10-04)
 
 ### Bug Fixes
