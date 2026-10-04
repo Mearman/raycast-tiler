@@ -111,9 +111,9 @@ interface TileRequest {
   /** Past-tense verb for the result toast. */
   verb: string;
   /**
-   * Set for auto tiling, which tiles the applications of the last tiling on the active desktop, and only when the set of their windows has changed since. `quiet` also skips closing Raycast and the success toast, for a background run.
+   * Set for auto tiling, which tiles the applications of the last tiling on the active desktop. `quiet` is the background run: it tiles only when the set of their windows has changed since the last tiling, and skips closing Raycast and the success toast. `now` is a run the user asked for, which tiles whatever the set.
    */
-  auto: "visible" | "quiet" | undefined;
+  auto: "now" | "quiet" | undefined;
 }
 
 async function tileWindows(request: Readonly<TileRequest>): Promise<void> {
@@ -174,7 +174,7 @@ async function tileWindows(request: Readonly<TileRequest>): Promise<void> {
     rearrange === undefined ? await loadLastTiling() : undefined;
   const autoApps = auto === undefined ? undefined : lastTiling?.bundleIds;
   if (auto !== undefined && autoApps === undefined) {
-    if (auto === "visible")
+    if (auto === "now")
       await showToast({
         style: Toast.Style.Failure,
         title: "Tile the windows once before using auto tiling",
@@ -197,7 +197,7 @@ async function tileWindows(request: Readonly<TileRequest>): Promise<void> {
   );
   const skipped = allowed.length - tileable.length;
   if (
-    autoApps !== undefined &&
+    auto === "quiet" &&
     !windowSetChanged(
       lastTiling?.windowIds,
       tileable.map((window) => window.id),
@@ -417,17 +417,17 @@ export async function runNumberedReorder(
 }
 
 /**
- * Re-tiles the applications of the last tiling when the set of their windows has changed since, reporting any error as a failure toast.
+ * Re-tiles the applications of the last tiling, reporting any error as a failure toast.
+ *
+ * A `quiet` run does so only when the set of their windows has changed since the last tiling; a `now` run always does.
  *
  * Uses the layout and scope of the last tiling. Windows of other applications are left alone. Does nothing when no tiling has run.
  */
-export async function runAutoTile(
-  visibility: "visible" | "quiet",
-): Promise<void> {
+export async function runAutoTile(mode: "now" | "quiet"): Promise<void> {
   try {
     const last = await loadLastTiling();
     if (last === undefined) {
-      if (visibility === "visible")
+      if (mode === "now")
         await showToast({
           style: Toast.Style.Failure,
           title: "Tile the windows once before using auto tiling",
@@ -441,7 +441,7 @@ export async function runAutoTile(
       order: undefined,
       rearrange: undefined,
       verb: "Tiled",
-      auto: visibility,
+      auto: mode,
     });
   } catch (error) {
     await showFailureToast(error, { title: "Could not auto tile windows" });
