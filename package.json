@@ -383,7 +383,7 @@
     },
     {
       "name": "swap-window-with-number",
-      "title": "Swap Window With Number",
+      "title": "Swap Window with Number",
       "description": "Swap the focused window with the window at a number in reading order (left to right, top to bottom, counting from 1).",
       "mode": "no-view",
       "keywords": [
