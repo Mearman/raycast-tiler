@@ -442,6 +442,55 @@
         "order",
         "previous"
       ]
+    },
+    {
+      "name": "enable-auto-tiling",
+      "title": "Enable Auto Tiling",
+      "description": "Switch auto tiling on: the applications of the last tiling are re-tiled when their windows open or close.",
+      "mode": "no-view",
+      "keywords": [
+        "auto",
+        "automatic",
+        "on",
+        "tile"
+      ]
+    },
+    {
+      "name": "disable-auto-tiling",
+      "title": "Disable Auto Tiling",
+      "description": "Switch auto tiling off.",
+      "mode": "no-view",
+      "keywords": [
+        "auto",
+        "automatic",
+        "off",
+        "tile"
+      ]
+    },
+    {
+      "name": "toggle-auto-tiling",
+      "title": "Toggle Auto Tiling",
+      "description": "Switch auto tiling on when it is off and off when it is on.",
+      "mode": "no-view",
+      "keywords": [
+        "auto",
+        "automatic",
+        "tile",
+        "toggle"
+      ]
+    },
+    {
+      "name": "auto-tile",
+      "title": "Auto Tile",
+      "description": "The scheduled check behind auto tiling. Open it once so Raycast starts the schedule; it then re-tiles quietly in the background while auto tiling is on.",
+      "mode": "no-view",
+      "interval": "30s",
+      "keywords": [
+        "auto",
+        "automatic",
+        "background",
+        "tile"
+      ]
     }
   ],
   "dependencies": {

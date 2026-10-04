@@ -7,6 +7,7 @@ const config: PartialStrykerOptions = {
     "src/layouts/*.ts",
     "!src/layouts/*.test.ts",
     "src/animation.ts",
+    "src/window-set.ts",
     "src/direction.ts",
     "src/filter.ts",
     "src/ordering.ts",

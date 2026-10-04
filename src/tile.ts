@@ -7,6 +7,7 @@ import {
 } from "@raycast/api";
 import { showFailureToast } from "@raycast/utils";
 import { animateMoves } from "./animation";
+import { windowSetChanged } from "./window-set";
 import { isAllowed } from "./filter";
 import { emptyCellWeightFor, isGridBalance } from "./grid-balance";
 import { isGapUnit } from "./layouts/gap";
@@ -82,6 +83,16 @@ async function windowsInScope(scope: Scope): Promise<Window[]> {
   return windows.filter((window) => window.application?.bundleId === bundleId);
 }
 
+async function windowsOfApps(apps: readonly string[]): Promise<Window[]> {
+  const windows = await WindowManagement.getWindowsOnActiveDesktop();
+
+  return windows.filter((window) => {
+    const bundleId = window.application?.bundleId;
+
+    return bundleId !== undefined && apps.includes(bundleId);
+  });
+}
+
 /** Rearranges windows already in slot order; `undefined` means this group has nothing to rearrange. */
 type Rearrange = (
   ordered: readonly PlacedWindow[],
@@ -99,12 +110,17 @@ interface TileRequest {
   rearrange: Rearrange | undefined;
   /** Past-tense verb for the result toast. */
   verb: string;
+  /**
+   * Set for auto tiling, which tiles the applications of the last tiling on the active desktop, and only when the set of their windows has changed since. `quiet` also skips closing Raycast and the success toast, for a background run.
+   */
+  auto: "visible" | "quiet" | undefined;
 }
 
 async function tileWindows(request: Readonly<TileRequest>): Promise<void> {
   // Raycast never dismisses its own window, so close it here: the desktop stays visible during the transition, and the previous application regains focus before the focused window is read.
-  await closeMainWindow({ clearRootSearch: true });
-  const { scope, rearrange, verb } = request;
+  if (request.auto !== "quiet")
+    await closeMainWindow({ clearRootSearch: true });
+  const { scope, rearrange, verb, auto } = request;
   const {
     layout: preferredLayout,
     windowOrder,
@@ -154,13 +170,22 @@ async function tileWindows(request: Readonly<TileRequest>): Promise<void> {
       : undefined;
   const isFocused = (window: PlacedWindow): boolean => window.id === focusedId;
 
-  const [lists, desktops, scoped, lastTiling] = await Promise.all([
+  const lastTiling =
+    rearrange === undefined ? await loadLastTiling() : undefined;
+  const autoApps = auto === undefined ? undefined : lastTiling?.bundleIds;
+  if (auto !== undefined && autoApps === undefined) {
+    if (auto === "visible")
+      await showToast({
+        style: Toast.Style.Failure,
+        title: "Tile the windows once before using auto tiling",
+      });
+
+    return;
+  }
+  const [lists, desktops, scoped] = await Promise.all([
     loadLists(),
     WindowManagement.getDesktops(),
-    windowsInScope(scope),
-    rearrange === undefined && (fillOpenSpace || order === "previous")
-      ? loadLastTiling()
-      : Promise.resolve(undefined),
+    autoApps === undefined ? windowsInScope(scope) : windowsOfApps(autoApps),
   ]);
 
   const allowed = scoped.filter((window) =>
@@ -171,6 +196,14 @@ async function tileWindows(request: Readonly<TileRequest>): Promise<void> {
       window.positionable && window.resizable && isPlaced(window),
   );
   const skipped = allowed.length - tileable.length;
+  if (
+    autoApps !== undefined &&
+    !windowSetChanged(
+      lastTiling?.windowIds,
+      tileable.map((window) => window.id),
+    )
+  )
+    return;
 
   const facts = {
     boundsOf: rectOf,
@@ -228,6 +261,7 @@ async function tileWindows(request: Readonly<TileRequest>): Promise<void> {
   });
 
   if (moves.length === 0) {
+    if (auto === "quiet") return;
     await showToast({
       style: Toast.Style.Failure,
       title:
@@ -243,6 +277,12 @@ async function tileWindows(request: Readonly<TileRequest>): Promise<void> {
       scope,
       layout,
       slots: moves.map((move) => move.rect),
+      bundleIds:
+        autoApps ??
+        [
+          ...new Set(moves.map((move) => move.window.application?.bundleId)),
+        ].filter((bundleId) => bundleId !== undefined),
+      windowIds: moves.map((move) => move.window.id),
     });
 
   // Windows already on their target are left alone, which also keeps them out of the sequential transition's time budget.
@@ -269,6 +309,7 @@ async function tileWindows(request: Readonly<TileRequest>): Promise<void> {
 
   const tiled = moves.length - failures.size;
   if (failures.size === 0 && skipped === 0) {
+    if (auto === "quiet") return;
     await showToast({
       style: Toast.Style.Success,
       title: `${verb} ${String(tiled)} ${tiled === 1 ? "window" : "windows"}`,
@@ -302,6 +343,7 @@ export async function runTile(scope: Scope, layout?: LayoutId): Promise<void> {
       order: undefined,
       rearrange: undefined,
       verb: "Tiled",
+      auto: undefined,
     });
   } catch (error) {
     await showFailureToast(error, { title: "Could not tile windows" });
@@ -333,6 +375,7 @@ async function reorderWith(rearrange: Rearrange): Promise<void> {
     order: "nearest",
     rearrange,
     verb: "Reordered",
+    auto: undefined,
   });
 }
 
@@ -370,5 +413,37 @@ export async function runNumberedReorder(
     );
   } catch (error) {
     await showFailureToast(error, { title: "Could not reorder windows" });
+  }
+}
+
+/**
+ * Re-tiles the applications of the last tiling when the set of their windows has changed since, reporting any error as a failure toast.
+ *
+ * Uses the layout and scope of the last tiling. Windows of other applications are left alone. Does nothing when no tiling has run.
+ */
+export async function runAutoTile(
+  visibility: "visible" | "quiet",
+): Promise<void> {
+  try {
+    const last = await loadLastTiling();
+    if (last === undefined) {
+      if (visibility === "visible")
+        await showToast({
+          style: Toast.Style.Failure,
+          title: "Tile the windows once before using auto tiling",
+        });
+
+      return;
+    }
+    await tileWindows({
+      scope: last.scope,
+      layout: last.layout,
+      order: undefined,
+      rearrange: undefined,
+      verb: "Tiled",
+      auto: visibility,
+    });
+  } catch (error) {
+    await showFailureToast(error, { title: "Could not auto tile windows" });
   }
 }
