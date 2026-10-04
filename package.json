@@ -1,7 +1,7 @@
 {
   "name": "window-tiler",
   "description": "Tile windows into grid, column, row, main-stack and spiral layouts, with include and exclude lists.",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "author": "mearman",
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "categories": [

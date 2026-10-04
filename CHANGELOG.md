@@ -1,3 +1,9 @@
+## [1.7.1](https://github.com/Mearman/raycast-tiler/compare/v1.7.0...v1.7.1) (2026-10-04)
+
+### Bug Fixes
+
+* tile on enabling auto tiling even when the window set is unchanged ([7a134c7](https://github.com/Mearman/raycast-tiler/commit/7a134c7f154e39846cafb23fd9c3fd22112c2733))
+
 ## [1.7.0](https://github.com/Mearman/raycast-tiler/compare/v1.6.0...v1.7.0) (2026-10-04)
 
 ### Features
