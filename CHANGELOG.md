@@ -1,3 +1,9 @@
+## [1.4.0](https://github.com/Mearman/raycast-tiler/compare/v1.3.0...v1.4.0) (2026-10-04)
+
+### Features
+
+* add a window order that keeps the previous relative order ([8518792](https://github.com/Mearman/raycast-tiler/commit/85187927c2663cd9350dd4af3d0cab400cc2aa6e))
+
 ## [1.3.0](https://github.com/Mearman/raycast-tiler/compare/v1.2.1...v1.3.0) (2026-10-02)
 
 ### Features
