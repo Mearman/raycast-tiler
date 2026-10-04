@@ -1,5 +1,6 @@
 import { neighbourInDirection, type Direction } from "./direction";
 import type { Rect } from "./layouts/types";
+import { readingOrder } from "./ordering";
 
 export const REORDER_ACTIONS = [
   "left",
@@ -100,4 +101,109 @@ export function swapInDirection<T>(
   result[from] = displaced;
 
   return result;
+}
+
+/** The ways to move the focused window to a numbered place in reading order. */
+export const NUMBERED_MOVES = ["swap", "insert"] as const;
+
+export type NumberedMove = (typeof NUMBERED_MOVES)[number];
+
+/** Reads a window number typed by the user; throws when it is not a whole number. */
+export function parseWindowNumber(raw: string): number {
+  const value = Number(raw.trim());
+  if (raw.trim() === "" || !Number.isInteger(value))
+    throw new Error(`The window number must be a whole number, got "${raw}"`);
+
+  return value;
+}
+
+function at<T>(items: readonly T[], index: number): T {
+  const item = items[index];
+  if (item === undefined) throw new Error("Index is outside the items");
+
+  return item;
+}
+
+interface NumberedRequest<T> {
+  items: readonly T[];
+  slots: readonly Rect[];
+  isActive: (item: T) => boolean;
+  position: number;
+}
+
+/**
+ * Applies `edit` to the items taken in reading order of their slots, then puts the edited sequence back into the same slots in reading order.
+ *
+ * `items[k]` occupies `slots[k]`. `position` counts from 1 along the reading order of the slots. Returns a new array, or `undefined` when no item is active. Throws when `position` is not a place in the sequence.
+ */
+function editInReadingOrder<T>(
+  { items, slots, isActive, position }: Readonly<NumberedRequest<T>>,
+  edit: (sequence: readonly T[], active: T, target: T) => T[],
+): T[] | undefined {
+  const active = items.find(isActive);
+  if (active === undefined) return undefined;
+  const places = readingOrder(
+    items.map((_, index) => index),
+    (index) => at(slots, index),
+  );
+  const sequence = places.map((place) => at(items, place));
+  const target = Number.isInteger(position)
+    ? sequence[position - 1]
+    : undefined;
+  if (target === undefined)
+    throw new Error(
+      `There is no window number ${String(position)}; the windows are numbered 1 to ${String(items.length)} in reading order`,
+    );
+  const edited = edit(sequence, active, target);
+  const result = [...items];
+  places.forEach((place, index) => {
+    result[place] = at(edited, index);
+  });
+
+  return result;
+}
+
+/**
+ * Swaps the active item with the item at `position` in reading order of the slots, counting from 1.
+ *
+ * `items[k]` occupies `slots[k]`. Returns a new array, or `undefined` when no item is active. Throws when `position` is not a place in the sequence.
+ */
+export function swapWithNumbered<T>(
+  items: readonly T[],
+  slots: readonly Rect[],
+  isActive: (item: T) => boolean,
+  position: number,
+): T[] | undefined {
+  return editInReadingOrder(
+    { items, slots, isActive, position },
+    (sequence, active, target) =>
+      sequence.map((item) => {
+        if (item === active) return target;
+
+        return item === target ? active : item;
+      }),
+  );
+}
+
+/**
+ * Moves the active item to just before the item at `position` in reading order of the slots, counting from 1, shifting the items in between along by one place.
+ *
+ * `items[k]` occupies `slots[k]`. Returns a new array, or `undefined` when no item is active. Throws when `position` is not a place in the sequence. Inserting before itself changes nothing.
+ */
+export function insertBeforeNumbered<T>(
+  items: readonly T[],
+  slots: readonly Rect[],
+  isActive: (item: T) => boolean,
+  position: number,
+): T[] | undefined {
+  return editInReadingOrder(
+    { items, slots, isActive, position },
+    (sequence, active, target) => {
+      if (target === active) return [...sequence];
+      const others = sequence.filter((item) => item !== active);
+      const before = others.indexOf(target);
+
+      return [...others.slice(0, before), active, ...others.slice(before)];
+    },
+  );
 }
