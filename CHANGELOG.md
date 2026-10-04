@@ -1,3 +1,9 @@
+## [1.5.0](https://github.com/Mearman/raycast-tiler/compare/v1.4.0...v1.5.0) (2026-10-04)
+
+### Features
+
+* default the window order to the previous order ([905597e](https://github.com/Mearman/raycast-tiler/commit/905597ed289e746c0ee0f49c7c5c60dff2b14940))
+
 ## [1.4.0](https://github.com/Mearman/raycast-tiler/compare/v1.3.0...v1.4.0) (2026-10-04)
 
 ### Features
