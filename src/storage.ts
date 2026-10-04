@@ -96,3 +96,40 @@ export async function loadAutoTile(): Promise<boolean> {
 export async function saveAutoTile(enabled: boolean): Promise<void> {
   await LocalStorage.setItem(AUTO_TILE_KEY, enabled);
 }
+
+const UNDO_KEY = "undo-tiling";
+
+/** Where one window sat before the last run moved it. */
+export interface UndoEntry {
+  id: string;
+  desktopId: string;
+  bounds: Rect;
+}
+
+function isUndoEntry(value: unknown): value is UndoEntry {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "id" in value &&
+    typeof value.id === "string" &&
+    "desktopId" in value &&
+    typeof value.desktopId === "string" &&
+    "bounds" in value &&
+    isRect(value.bounds)
+  );
+}
+
+/** Reads the windows the last run moved with their earlier bounds, or `undefined` when none were saved. Throws if the stored value is malformed. */
+export async function loadUndo(): Promise<UndoEntry[] | undefined> {
+  const raw = await LocalStorage.getItem<string>(UNDO_KEY);
+  if (raw === undefined) return undefined;
+  const parsed: unknown = JSON.parse(raw);
+  if (!Array.isArray(parsed) || !parsed.every(isUndoEntry))
+    throw new Error("Stored undo data is malformed");
+
+  return parsed;
+}
+
+export async function saveUndo(entries: readonly UndoEntry[]): Promise<void> {
+  await LocalStorage.setItem(UNDO_KEY, JSON.stringify(entries));
+}

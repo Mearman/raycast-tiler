@@ -94,6 +94,18 @@
       ]
     },
     {
+      "name": "undo-tiling",
+      "title": "Undo Tiling",
+      "description": "Put the windows the last tiling, reorder or auto tiling run moved back where they were. Running it again redoes the run.",
+      "mode": "no-view",
+      "keywords": [
+        "restore",
+        "revert",
+        "tile",
+        "undo"
+      ]
+    },
+    {
       "name": "manage-lists",
       "title": "Tiling Lists",
       "description": "Choose which applications are always left alone and, optionally, which are the only ones tiled.",

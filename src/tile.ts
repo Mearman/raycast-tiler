@@ -6,7 +6,7 @@ import {
   WindowManagement,
 } from "@raycast/api";
 import { showFailureToast } from "@raycast/utils";
-import { animateMoves } from "./animation";
+import { animateMoves, type Timing } from "./animation";
 import { windowSetChanged } from "./window-set";
 import { isAllowed } from "./filter";
 import { emptyCellWeightFor, isGridBalance } from "./grid-balance";
@@ -28,7 +28,13 @@ import {
 import { rectsMatch } from "./rects";
 import type { Scope } from "./scope";
 import { orderBySlotStably } from "./stability";
-import { loadLastTiling, loadLists, saveLastTiling } from "./storage";
+import {
+  loadLastTiling,
+  loadLists,
+  loadUndo,
+  saveLastTiling,
+  saveUndo,
+} from "./storage";
 
 type Window = WindowManagement.Window;
 
@@ -48,6 +54,36 @@ function parseNonNegative(name: string, raw: string | undefined): number {
     throw new Error(`${name} must be a non-negative number, got "${raw}"`);
 
   return value;
+}
+
+function timingFrom(
+  preferences: Readonly<
+    Pick<
+      Preferences,
+      "moveDuration" | "resizeDuration" | "sequentialTransitions"
+    >
+  >,
+): Timing {
+  return {
+    moveMs: parseNonNegative("Move duration", preferences.moveDuration),
+    sequential: preferences.sequentialTransitions,
+    resizeMs: parseNonNegative("Resize duration", preferences.resizeDuration),
+  };
+}
+
+async function setBounds(
+  id: string,
+  desktopId: string,
+  rect: Readonly<Rect>,
+): Promise<void> {
+  await WindowManagement.setWindowBounds({
+    id,
+    desktopId,
+    bounds: {
+      position: { x: rect.x, y: rect.y },
+      size: { width: rect.width, height: rect.height },
+    },
+  });
 }
 
 type PlacedWindow = Window & {
@@ -121,6 +157,7 @@ async function tileWindows(request: Readonly<TileRequest>): Promise<void> {
   if (request.auto !== "quiet")
     await closeMainWindow({ clearRootSearch: true });
   const { scope, rearrange, verb, auto } = request;
+  const preferences = getPreferenceValues<Preferences>();
   const {
     layout: preferredLayout,
     windowOrder,
@@ -130,11 +167,8 @@ async function tileWindows(request: Readonly<TileRequest>): Promise<void> {
     gapAtEdge,
     gapBetween,
     gridBalance,
-    sequentialTransitions,
     gridEmptyCellPenalty: rawCustomPenalty,
-    moveDuration: rawMoveDuration,
-    resizeDuration: rawResizeDuration,
-  } = getPreferenceValues<Preferences>();
+  } = preferences;
   const layout = request.layout ?? preferredLayout;
   if (!isLayoutId(layout))
     throw new Error(`Unknown layout "${String(layout)}"`);
@@ -157,11 +191,7 @@ async function tileWindows(request: Readonly<TileRequest>): Promise<void> {
     edge: gapAtEdge,
     between: gapBetween,
   };
-  const timing = {
-    moveMs: parseNonNegative("Move duration", rawMoveDuration),
-    sequential: sequentialTransitions,
-    resizeMs: parseNonNegative("Resize duration", rawResizeDuration),
-  };
+  const timing = timingFrom(preferences);
 
   // `Window.active` is true for every window of the frontmost application, so the one focused window is found by id.
   const focusedId =
@@ -289,6 +319,14 @@ async function tileWindows(request: Readonly<TileRequest>): Promise<void> {
   const outstanding = moves.filter(
     (move) => !rectsMatch(rectOf(move.window), move.rect),
   );
+  if (outstanding.length > 0)
+    await saveUndo(
+      outstanding.map(({ window, desktopId }) => ({
+        id: window.id,
+        desktopId,
+        bounds: rectOf(window),
+      })),
+    );
   const failures = await animateMoves(
     outstanding.map((move) => ({
       subject: move,
@@ -296,14 +334,7 @@ async function tileWindows(request: Readonly<TileRequest>): Promise<void> {
       to: move.rect,
     })),
     async ({ window, desktopId }, rect) =>
-      WindowManagement.setWindowBounds({
-        id: window.id,
-        desktopId,
-        bounds: {
-          position: { x: rect.x, y: rect.y },
-          size: { width: rect.width, height: rect.height },
-        },
-      }),
+      setBounds(window.id, desktopId, rect),
     timing,
   );
 
@@ -445,5 +476,64 @@ export async function runAutoTile(mode: "now" | "quiet"): Promise<void> {
     });
   } catch (error) {
     await showFailureToast(error, { title: "Could not auto tile windows" });
+  }
+}
+
+/**
+ * Puts the windows the last run moved back where they were, reporting any error as a failure toast.
+ *
+ * Only windows on the active desktop are restored. The positions they leave are saved in turn, so running it again redoes the run.
+ */
+export async function runUndo(): Promise<void> {
+  try {
+    await closeMainWindow({ clearRootSearch: true });
+    const saved = await loadUndo();
+    const windows = (await WindowManagement.getWindowsOnActiveDesktop()).filter(
+      isPlaced,
+    );
+    const restorable = (saved ?? []).flatMap((entry) => {
+      const window = windows.find((candidate) => candidate.id === entry.id);
+
+      return window === undefined ? [] : [{ entry, window }];
+    });
+    if (restorable.length === 0) {
+      await showToast({
+        style: Toast.Style.Failure,
+        title: "Nothing to undo on this desktop",
+      });
+
+      return;
+    }
+    await saveUndo(
+      restorable.map(({ entry, window }) => ({
+        id: entry.id,
+        desktopId: entry.desktopId,
+        bounds: rectOf(window),
+      })),
+    );
+    const failures = await animateMoves(
+      restorable.map((item) => ({
+        subject: item,
+        from: rectOf(item.window),
+        to: item.entry.bounds,
+      })),
+      async ({ entry }, rect) => setBounds(entry.id, entry.desktopId, rect),
+      timingFrom(getPreferenceValues<Preferences>()),
+    );
+    const restored = restorable.length - failures.size;
+    await showToast(
+      failures.size === 0
+        ? {
+            style: Toast.Style.Success,
+            title: `Restored ${String(restored)} ${restored === 1 ? "window" : "windows"}`,
+          }
+        : {
+            style: Toast.Style.Failure,
+            title: `Restored ${String(restored)} of ${String(restorable.length)} windows`,
+            message: String([...failures.values()][0]),
+          },
+    );
+  } catch (error) {
+    await showFailureToast(error, { title: "Could not undo the tiling" });
   }
 }
