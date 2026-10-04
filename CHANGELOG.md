@@ -1,3 +1,9 @@
+## [1.7.0](https://github.com/Mearman/raycast-tiler/compare/v1.6.0...v1.7.0) (2026-10-04)
+
+### Features
+
+* add auto tiling that re-tiles the applications of the last tiling ([1edda8a](https://github.com/Mearman/raycast-tiler/commit/1edda8a4bea3ee6a97c2ba0fcaa7f06a3c8a9fcd))
+
 ## [1.6.0](https://github.com/Mearman/raycast-tiler/compare/v1.5.0...v1.6.0) (2026-10-04)
 
 ### Features
