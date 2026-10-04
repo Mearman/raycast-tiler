@@ -52,6 +52,18 @@
       ]
     },
     {
+      "name": "tile-with-layout",
+      "title": "Tile with Layout",
+      "description": "Choose a layout from a list and tile the windows of the active desktop or of the frontmost application with it.",
+      "mode": "view",
+      "keywords": [
+        "choose",
+        "layout",
+        "pick",
+        "tile"
+      ]
+    },
+    {
       "name": "tile-desktop",
       "title": "Tile Windows",
       "description": "Tile every window on the active desktop in the layout chosen in preferences, or in the layout given as the optional argument.",
@@ -115,6 +127,7 @@
       "name": "tile-desktop-grid",
       "title": "Tile Windows: Grid",
       "description": "Tile every window on the active desktop as Grid, whatever the layout preference says.",
+      "icon": "layout-grid.png",
       "mode": "no-view",
       "keywords": [
         "arrange",
@@ -128,6 +141,7 @@
       "name": "tile-desktop-columns",
       "title": "Tile Windows: Columns",
       "description": "Tile every window on the active desktop as Columns, whatever the layout preference says.",
+      "icon": "layout-columns.png",
       "mode": "no-view",
       "keywords": [
         "arrange",
@@ -141,6 +155,7 @@
       "name": "tile-desktop-rows",
       "title": "Tile Windows: Rows",
       "description": "Tile every window on the active desktop as Rows, whatever the layout preference says.",
+      "icon": "layout-rows.png",
       "mode": "no-view",
       "keywords": [
         "arrange",
@@ -154,6 +169,7 @@
       "name": "tile-desktop-main-stack",
       "title": "Tile Windows: Main + Stack",
       "description": "Tile every window on the active desktop as Main and Stack, whatever the layout preference says.",
+      "icon": "layout-main-stack.png",
       "mode": "no-view",
       "keywords": [
         "arrange",
@@ -167,6 +183,7 @@
       "name": "tile-desktop-spiral",
       "title": "Tile Windows: Spiral",
       "description": "Tile every window on the active desktop as Spiral, whatever the layout preference says.",
+      "icon": "layout-spiral.png",
       "mode": "no-view",
       "keywords": [
         "arrange",
@@ -180,6 +197,7 @@
       "name": "tile-current-app-grid",
       "title": "Tile App: Grid",
       "description": "Tile every window of the frontmost application as Grid, whatever the layout preference says.",
+      "icon": "layout-grid.png",
       "mode": "no-view",
       "keywords": [
         "application",
@@ -193,6 +211,7 @@
       "name": "tile-current-app-columns",
       "title": "Tile App: Columns",
       "description": "Tile every window of the frontmost application as Columns, whatever the layout preference says.",
+      "icon": "layout-columns.png",
       "mode": "no-view",
       "keywords": [
         "application",
@@ -206,6 +225,7 @@
       "name": "tile-current-app-rows",
       "title": "Tile App: Rows",
       "description": "Tile every window of the frontmost application as Rows, whatever the layout preference says.",
+      "icon": "layout-rows.png",
       "mode": "no-view",
       "keywords": [
         "application",
@@ -219,6 +239,7 @@
       "name": "tile-current-app-main-stack",
       "title": "Tile App: Main + Stack",
       "description": "Tile every window of the frontmost application as Main and Stack, whatever the layout preference says.",
+      "icon": "layout-main-stack.png",
       "mode": "no-view",
       "keywords": [
         "application",
@@ -232,6 +253,7 @@
       "name": "tile-current-app-spiral",
       "title": "Tile App: Spiral",
       "description": "Tile every window of the frontmost application as Spiral, whatever the layout preference says.",
+      "icon": "layout-spiral.png",
       "mode": "no-view",
       "keywords": [
         "application",
