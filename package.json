@@ -519,7 +519,7 @@
       "description": "Which window goes in which layout slot. Nearest keeps windows close to where they are; Reading Order goes top to bottom then left to right; Active First puts the focused window in the first slot (the main slot in Main + Stack); App Priority follows the order of the include list; Previous Order keeps windows in the order they had in the last tiling.",
       "type": "dropdown",
       "required": false,
-      "default": "nearest",
+      "default": "previous",
       "data": [
         {
           "title": "Nearest Slot",

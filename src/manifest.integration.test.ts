@@ -19,6 +19,7 @@ interface Command {
 }
 interface Preference {
   name: string;
+  default?: string | boolean;
   data?: { value: string }[];
 }
 interface Manifest {
@@ -77,6 +78,13 @@ describe("manifest", () => {
       (pref) => pref.name === "fillOpenSpace",
     );
     expect(fill).toBeDefined();
+  });
+
+  it("defaults the window order to the previous order", () => {
+    const order = parsed.preferences.find(
+      (pref) => pref.name === "windowOrder",
+    );
+    expect(order?.default).toBe("previous");
   });
 
   it("offers every gap unit in the gap unit preference", () => {
