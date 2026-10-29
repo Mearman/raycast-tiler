@@ -1,3 +1,9 @@
+## [1.8.1](https://github.com/Mearman/raycast-tiler/compare/v1.8.0...v1.8.1) (2026-10-29)
+
+### Documentation
+
+* add the standard badge row to the README ([20d4b6d](https://github.com/Mearman/raycast-tiler/commit/20d4b6d3732fc3dda247dacf18d9e5e2ae25e2b1))
+
 ## [1.8.0](https://github.com/Mearman/raycast-tiler/compare/v1.7.1...v1.8.0) (2026-10-04)
 
 ### Features
