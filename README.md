@@ -1,5 +1,7 @@
 # Window Tiler
 
+[![GitHub](https://img.shields.io/badge/GitHub-181717?logo=github&logoColor=white)](https://github.com/Mearman/raycast-tiler) [![Release](https://img.shields.io/github/v/release/Mearman/raycast-tiler)](https://github.com/Mearman/raycast-tiler/releases/latest) [![CI](https://img.shields.io/github/actions/workflow/status/Mearman/raycast-tiler/ci.yml?branch=main)](https://github.com/Mearman/raycast-tiler/actions)
+
 Raycast extension that tiles macOS windows into a layout, with include and exclude lists for applications. Stack: TypeScript, React, the Raycast API, pnpm, Vitest.
 
 ## Commands
