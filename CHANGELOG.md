@@ -1,3 +1,10 @@
+## [1.8.2](https://github.com/Mearman/raycast-tiler/compare/v1.8.1...v1.8.2) (2026-10-31)
+
+### Continuous Integration
+
+* push the release over SSH with a deploy key ([ad18bec](https://github.com/Mearman/raycast-tiler/commit/ad18beccb0ede0c714114a55b090f00e0c5fd72c))
+* push the release to the SSH repository URL ([6c3facf](https://github.com/Mearman/raycast-tiler/commit/6c3facffc8cf5fa64154f59ee5e5b4f42ae1b784))
+
 ## [1.8.1](https://github.com/Mearman/raycast-tiler/compare/v1.8.0...v1.8.1) (2026-10-29)
 
 ### Documentation
